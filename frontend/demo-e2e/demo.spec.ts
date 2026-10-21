@@ -16,7 +16,11 @@ async function enter(page:Page,compare=false){
   await page.getByRole('button',{name:compare?'體驗財務比較':'體驗預算編列',exact:true}).click();
   await expect(page.getByLabel('目前館別',{exact:true}).locator('option')).toHaveCount(12);
 }
+async function menu(page:Page){
+  if(!await page.getByRole('dialog',{name:'工作範圍與編列版本'}).isVisible())await page.getByRole('button',{name:'開啟工作選單',exact:true}).click();
+}
 async function draft(page:Page,y='2028'){
+  await menu(page);
   await page.getByLabel('預算年度',{exact:true}).selectOption(y);
   await page.getByRole('button',{name:/建立新草稿/}).click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeVisible();
@@ -36,7 +40,7 @@ test('子路徑開啟、匿名 12 館、無帳密與無 API／外部請求',asyn
   await expect(page.getByRole('complementary',{name:'匿名展示版說明'})).toBeVisible();
   const names=await page.getByLabel('目前館別',{exact:true}).locator('option').allTextContents();
   expect(names).toEqual(Array.from({length:12},(_,i)=>`第 ${String(i+1).padStart(2,'0')} 示範館`));
-  await page.locator('.v13-version-card').first().click();
+  await menu(page);await page.locator('.v13-version-card').first().click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
   await page.getByRole('button',{name:'開啟帳號與管理資訊'}).click();
   await expect(page.getByRole('dialog')).toContainText('匿名展示訪客');
@@ -55,15 +59,16 @@ test('精確金額、自動儲存、REV 覆寫、重新整理與提交唯讀',as
   state=await stored(page);v=state.versions.find((v:any)=>v.year===2028);
   expect(v.lines[0]).toMatchObject({ahr:'3.000',rev:'9.000'});
   await page.reload();await page.getByRole('button',{name:'體驗預算編列',exact:true}).click();
-  await page.getByLabel('預算年度',{exact:true}).selectOption('2028');
+  await menu(page);await page.getByLabel('預算年度',{exact:true}).selectOption('2028');
   await page.locator('.v13-version-card').first().click();await expect(rn).toHaveValue('3');
   await expect(page.getByLabel('1月 Retail:官網 ahr',{exact:true})).toHaveValue('3.000');
   await page.getByRole('button',{name:/提交此版本/}).click();await expect(rn).toBeDisabled();
-  await expect(page.getByRole('button',{name:'刪除草稿',exact:true})).toBeDisabled();
+  await menu(page);await expect(page.getByRole('button',{name:'刪除草稿',exact:true})).toBeDisabled();
 });
 
 test('超售匯入整批拒絕，原本草稿不受影響',async({page})=>{
   await enter(page);await draft(page);
+  await page.locator('.budget-file-menu > summary').click();
   const bad=fixture(xml=>xml.replace('<c r="C2" t="inlineStr"><is><t>0</t>','<c r="C2" t="inlineStr"><is><t>999999</t>').replace('<c r="D2" t="inlineStr"><is><t>0</t>','<c r="D2" t="inlineStr"><is><t>100</t>'));
   await page.getByLabel('選擇匯入 Excel').setInputFiles({name:'anonymous-over-capacity.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:bad});
   await expect(page.getByText('匯入預覽：108 筆')).toBeVisible();
@@ -81,6 +86,7 @@ test('財務比較、單一來源獨立副本與凍結房晚',async({page})=>{
   const rn=page.getByLabel('1月 Retail:官網 rn',{exact:true});await expect(rn).toBeEnabled();
   const before=await stored(page),source=before.versions.find((v:any)=>v.id===1),finance=before.versions.find((v:any)=>v.kind==='finance');
   await page.getByLabel('1月 Retail:官網 ahr',{exact:true}).fill('4200');await saved(page);
+  await page.locator('.setting-summary').click();
   await page.getByLabel('房間數',{exact:true}).fill('90');
   await page.getByRole('button',{name:'儲存房間數',exact:true}).click();
   await expect(page.getByRole('alert')).toContainText('房間數已儲存');
@@ -92,6 +98,7 @@ test('財務比較、單一來源獨立副本與凍結房晚',async({page})=>{
 
 test('XLSX 下載／匯入與公式、外連、壓縮過大檔案拒絕',async({page})=>{
   await enter(page);await draft(page);
+  await page.locator('.budget-file-menu > summary').click();
   const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:/下載範本/}).click();
   const download=await downloadEvent,bytes=await readFile((await download.path())!);
   const zip=unzipSync(bytes);expect(strFromU8(zip['xl/worksheets/sheet1.xml'])).toContain('<t>ahr</t>');
@@ -115,9 +122,57 @@ test('分頁隔離、重設與窄螢幕橫向表格',async({page,browser})=>{
   await expect(other.getByRole('button',{name:'體驗預算編列',exact:true})).toBeVisible();expect(await stored(other)).toBeNull();await context.close();
   page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'重設示範資料',exact:true}).click();
   await page.getByRole('button',{name:'體驗預算編列',exact:true}).click();
-  await page.getByLabel('預算年度',{exact:true}).selectOption('2028');await expect(page.locator('.v13-version-card')).toHaveCount(0);
+  await menu(page);await page.getByLabel('預算年度',{exact:true}).selectOption('2028');await expect(page.locator('.v13-version-card')).toHaveCount(0);
   await page.getByLabel('預算年度',{exact:true}).selectOption('2027');await page.locator('.v13-version-card').last().click();
   await page.setViewportSize({width:390,height:844});
   expect(await page.getByRole('region',{name:'月份與通路預算表'}).evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+2)).toBe(true);
+});
+
+test('首屏可編列、點擊說明、摘要即時更新且捲動後可見',async({page})=>{
+  await page.setViewportSize({width:1366,height:633});await enter(page);
+  const rn=page.getByLabel('1月 Retail:官網 rn',{exact:true});
+  await expect(rn).toBeEnabled();
+  expect((await rn.boundingBox())!.y+(await rn.boundingBox())!.height).toBeLessThan(605);
+  await expect(page.getByLabel('房間數',{exact:true})).toBeHidden();
+  await page.locator('.input-help > summary').click();
+  await expect(page.locator('.input-help')).toContainText('白底 R/N 與 AHR 可編輯');
+  await page.locator('.input-help > summary').click();
+  const total=page.getByLabel('全年營收',{exact:true});
+  const before=Number((await total.innerText()).replaceAll(',',''));
+  const rate=Number(await page.getByLabel('1月 Retail:官網 ahr',{exact:true}).inputValue());
+  await rn.fill(String(Number(await rn.inputValue())+1));
+  await expect(total).toHaveText((before+rate).toLocaleString('zh-TW',{minimumFractionDigits:3,maximumFractionDigits:3}));
+  await page.getByRole('region',{name:'月份與通路預算表'}).evaluate(e=>e.scrollTop=e.scrollHeight);
+  await page.evaluate(()=>window.scrollTo(0,470));
+  const box=(await page.getByRole('region',{name:'全年即時預算摘要'}).boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(68);expect(box.y+box.height).toBeLessThan(605);
+  // Data cells have one border system; computed and editable fields differ by surface.
+  const colors=await page.locator('.budget-matrix').evaluate(e=>({
+    edit:getComputedStyle(e.querySelector('td.editable')!).backgroundColor,
+    calc:getComputedStyle(e.querySelector('td.calculated')!).backgroundColor,
+    border:getComputedStyle(e.querySelector('td.editable')!).borderRightColor,
+    calcBorder:getComputedStyle(e.querySelector('td.calculated')!).borderRightColor,
+  }));
+  expect(colors.edit).toBe('rgb(255, 255, 255)');expect(colors.calc).toBe('rgb(240, 241, 239)');expect(colors.border).toBe(colors.calcBorder);
+});
+
+test('手機邊緣右滑選單、焦點限制、Escape 與減少動態設定',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'reduce'});await enter(page);
+  const button=page.getByRole('button',{name:'開啟工作選單',exact:true});
+  await button.focus();
+  await page.locator('.work-heading').evaluate(e=>{
+    const start=new Touch({identifier:1,target:e,clientX:12,clientY:130});
+    const end=new Touch({identifier:1,target:e,clientX:120,clientY:135});
+    e.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,touches:[start],changedTouches:[start]}));
+    e.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[end]}));
+  });
+  const dialog=page.getByRole('dialog',{name:'工作範圍與編列版本'});await expect(dialog).toBeVisible();
+  expect((await dialog.boundingBox())!.x).toBe(0);
+  expect(await dialog.evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
+  await expect(dialog.getByRole('button',{name:'返回展示首頁'})).toHaveCount(0);
+  await dialog.getByRole('button',{name:'返回目前工作區 →',exact:true}).focus();await page.keyboard.press('Tab');
+  expect(await dialog.evaluate(e=>e.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press('Escape');await expect(dialog).toBeHidden();await expect(button).toBeFocused();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
 });

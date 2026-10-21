@@ -7,3 +7,5 @@ import {createDemoTransport} from './transport';
 
 const demo=createDemoTransport();
 createRoot(document.getElementById('root')!).render(<App demo transport={demo.transport} onDemoReset={demo.reset}/>);
+
+import '../workspace.css';
