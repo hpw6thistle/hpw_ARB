@@ -171,13 +171,6 @@ body{background:#f5f6f3;color:var(--work-ink)}
 
 /* v1.7.2: contextual heading, centered picker and stronger version states. */
 .v13-app .ui-help-bubble{white-space:normal;overflow-wrap:anywhere}
-.work-nav-context{margin-left:auto;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.work-nav-scope{font-size:10px;color:#82907d;white-space:nowrap}
-.work-nav-context>div{display:flex;align-items:center;gap:12px}
-.work-nav-context h1{font-size:15px;line-height:1.5;font-weight:600;color:#3f5945;letter-spacing:.04em;margin:0}
-.nav-version{font-size:10px;color:#7e8d77;white-space:nowrap;border-left:1px solid #dce1d7;padding-left:12px}
-.nav-version.submitted{color:#a7473e}
-.v13-app .work-menu-trigger{margin-left:0}
 .work-heading.work-hero{padding:0;margin-bottom:4px}
 .work-hero>button{margin-block:20px}
 .v13-app .v13-submit-bar>button{margin-block:20px}
@@ -193,10 +186,9 @@ body{background:#f5f6f3;color:var(--work-ink)}
 .v13-app .workspace-panel .v13-version-card.active .v13-version-id{color:#d3decf}
 .v13-app .workspace-panel .v13-version-card.active .v13-status.draft{background:#526f5b;color:#f4f7ed}
 @media(max-width:900px){
-  .v13-app .work-navbar{display:grid;grid-template-columns:auto minmax(0,1fr) 36px 32px;grid-template-rows:44px 20px;column-gap:10px;row-gap:2px;min-height:92px;height:92px;padding-top:10px;padding-bottom:10px}
-  .work-nav-tabs{justify-self:start}.work-nav-context{grid-column:1/-1;grid-row:2;width:100%;flex-direction:row;align-items:center;justify-content:space-between;margin:0;gap:10px}
-  .work-nav-context h1{display:none}.work-nav-context .nav-version{border:0;padding:0}.work-nav-scope,.nav-version{font-size:10px}
-  .v13-app section.annual-summary{top:92px}.v13-app .toast-notice{top:102px}
+  .v13-app .work-navbar{display:grid;grid-template-columns:auto minmax(0,1fr) 36px 32px;grid-template-rows:44px;column-gap:10px;row-gap:0;min-height:64px;height:64px;padding-top:10px;padding-bottom:10px}
+  .work-nav-tabs{justify-self:start}
+  .v13-app section.annual-summary{top:64px}.v13-app .toast-notice{top:74px}
   .workspace-panel{width:calc(100vw - 28px);max-width:700px;max-height:calc(100dvh - 32px)}
 }
 @media(max-width:720px){
@@ -205,7 +197,7 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .v13-app .workspace-panel .v13-version-card{padding:12px;gap:6px}
   .annual-kpi>span{white-space:normal;min-height:27px}.annual-kpi>span small{display:block;margin-left:0}
 }
-@media(max-width:370px){.v13-app .work-navbar{column-gap:4px;grid-template-columns:auto minmax(0,1fr) 30px 30px}.work-nav-scope,.nav-version,.annual-kpi>span{font-size:9px}.v13-app .workspace-panel .v13-version-card{padding:10px;gap:4px}.v13-app .v13-budget-section .v13-section-head{flex-wrap:wrap}.work-editor-tools{margin-left:auto}}
+@media(max-width:370px){.v13-app .work-navbar{column-gap:4px;grid-template-columns:auto minmax(0,1fr) 30px 30px}.annual-kpi>span{font-size:9px}.v13-app .workspace-panel .v13-version-card{padding:10px;gap:4px}.v13-app .v13-budget-section .v13-section-head{flex-wrap:wrap}.work-editor-tools{margin-left:auto}}
 
 /* All unavailable-night controls share a muted red palette. */
 .v13-app .inventory-details .monthbox{background:#fff6f4;border-color:#e7cbc5;color:#99584f}
@@ -214,11 +206,36 @@ body{background:#f5f6f3;color:var(--work-ink)}
 .v13-app .inventory-details .monthbox label{color:#99584f}
 .v13-app .inventory-details .monthbox input{border-color:#d7aaa1;color:#984c41;background:#fffdfc;accent-color:#a95b50}
 .v13-app .inventory-details .monthbox input:focus-visible{outline:2px solid #b16a5e;outline-offset:2px}
-/* Scope, year and version stay on the same information line. */
-.work-nav-context{flex-direction:row;align-items:center;gap:14px}
-.work-nav-context>div{display:contents}
-.work-nav-context h1{display:block;position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.work-nav-scope{font-size:11px}
 .finance-heading-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-@media(max-width:900px){.work-nav-context{flex-direction:row;align-items:center}.work-nav-scope{font-size:10px}}
-@media(max-width:370px){.work-nav-scope{font-size:9px}}
+
+/* One-row navigation above; the active worksheet and version live below. */
+.v13-app .work-navbar{background:#36594c;border-bottom-color:#2b493e;color:#f5f8f4}
+.v13-app button.work-brand{color:#f5f8f4}
+.v13-app .work-nav-tabs button{color:#cbdad1;white-space:nowrap}
+.v13-app .work-nav-tabs button[aria-selected=true]{color:#fff;border-bottom-color:#d6e5c8}
+.v13-app .work-navbar .work-menu-trigger{margin-left:auto;color:#f2f6ee;background:transparent}
+.v13-app .work-navbar .work-account{color:#eff5ed;background:transparent}
+.work-account .v13-avatar{background:#507062;color:#fff}
+.v13-app .work-navbar button:focus-visible{outline:2px solid #e4edc9;outline-offset:2px}
+.v13-app .v13-status-bar{z-index:46;min-height:48px;gap:12px;padding:0 20px env(safe-area-inset-bottom,0px);background:#e8ede6;border-top:1px solid #ced8cc;color:#657760}
+.v13-app button.workspace-sheet{display:flex;align-items:center;gap:12px;flex:none;align-self:stretch;margin-top:5px;padding:8px 15px;background:#fff;color:#3e614b;border:1px solid #cbd7c7;border-bottom:3px solid #52775b;border-radius:7px 7px 0 0;font-size:12px;white-space:nowrap;min-height:42px}
+.workspace-sheet span+span{border-left:1px solid #dce4d7;padding-left:12px}
+.sheet-version{font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sheet-version.submitted{color:#a7473e}
+.sheet-release,.sheet-storage{font-size:10px}
+.v13-app{padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+@media(max-width:900px){
+  .v13-app .work-nav-tabs{margin-left:0;gap:0}
+  .v13-app .v13-status-bar{padding-inline:10px;gap:10px}
+  .v13-app button.workspace-sheet{font-size:11px;padding:8px 10px;gap:8px}
+  .workspace-sheet span+span{padding-left:8px}
+  .sheet-version{font-size:10px}
+  .sheet-release,.sheet-storage,.v13-status-bar .status-spacer{display:none}
+}
+@media(max-width:370px){
+  .v13-app .work-nav-tabs button{font-size:9px;padding-inline:3px}
+  .v13-app .v13-status-bar{padding-inline:6px;gap:7px}
+  .v13-app button.workspace-sheet{font-size:10px;padding-inline:7px;gap:6px}
+  .workspace-sheet span+span{padding-left:6px}
+  .sheet-version{font-size:9px}
+}

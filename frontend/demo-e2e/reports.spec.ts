@@ -75,13 +75,15 @@ test('財務調整立即儲存、完整損益編列、Excel／PDF 及提交鎖�
   await page.getByRole('button',{name:'預覽報表',exact:true}).click();await page.getByRole('tab',{name:'損益科目編列',exact:true}).click();await expect(page.getByLabel('1月 6000101 金額',{exact:true})).toBeDisabled();await expect(page.getByLabel('所得稅計算方式')).toBeDisabled();
   expect(calls).toEqual([]);
 });
-test('損益無效輸入阻擋匯出、還原及手機紅色房晚區／單行資訊',async({page})=>{
+test('損益無效輸入阻擋匯出、還原及手機紅色房晚區／底部工作表',async({page})=>{
   await finance(page);await page.getByRole('button',{name:'儲存並預覽報表',exact:true}).click();
   await page.getByRole('tab',{name:'損益科目編列',exact:true}).click();await page.getByLabel('1月 6000101 金額',{exact:true}).fill('-');
   let downloaded=false;page.on('download',()=>downloaded=true);await page.getByRole('button',{name:'儲存並匯出 Excel',exact:true}).click();await expect(page.getByRole('alert')).toContainText('最多三位小數');expect(downloaded).toBe(false);
   await expect(page.getByRole('tab',{name:'預算編列',exact:true})).toBeDisabled();page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'還原變更',exact:true}).click();
   await page.getByRole('tab',{name:'預算編列',exact:true}).click();await page.locator('.setting-summary').click();await page.locator('.inventory-details>summary').click();
   const palette=await page.locator('.inventory-details .monthbox').first().evaluate(e=>({bg:getComputedStyle(e).backgroundColor,border:getComputedStyle(e).borderColor,text:getComputedStyle(e.querySelector('strong')!).color}));expect(palette).toEqual({bg:'rgb(255, 246, 244)',border:'rgb(231, 203, 197)',text:'rgb(145, 73, 63)'});
-  const scope=(await page.locator('.work-nav-scope').boundingBox())!,version=(await page.locator('.nav-version').boundingBox())!;expect(Math.abs(scope.y+scope.height/2-version.y-version.height/2)).toBeLessThan(2);
+  await expect(page.locator('.work-nav-context')).toHaveCount(0);
+  await expect(page.getByRole('region',{name:'目前工作表',exact:true})).toContainText('2027 年');
+  await expect(page.locator('.workspace-sheet')).toContainText('財務調整預算');
   await page.getByRole('button',{name:'儲存並預覽報表',exact:true}).click();await page.setViewportSize({width:390,height:844});await expect(page.getByRole('region',{name:'客房部損益表',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
 });
