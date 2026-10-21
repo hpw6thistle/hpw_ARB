@@ -1,0 +1,4 @@
+.demo-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;margin-bottom:18px;border:1px solid #bbd5cd;border-radius:12px;background:#f0f8f5;color:#28574b}
+.demo-banner>div{display:flex;flex-wrap:wrap;align-items:center;gap:14px}.demo-banner strong{white-space:nowrap}.demo-banner span{font-size:13px}.demo-banner button{white-space:nowrap;flex-shrink:0}
+.demo-welcome-actions{display:grid;gap:12px;margin:24px 0}.demo-welcome small{display:block;line-height:1.9;color:#66756f}
+@media(max-width:600px){.demo-banner{align-items:flex-start;padding:12px;gap:10px}.demo-banner>div{display:grid;gap:6px}.demo-banner span{font-size:12px}.demo-banner button{font-size:12px;padding:8px}}
