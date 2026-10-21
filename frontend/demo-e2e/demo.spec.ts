@@ -169,7 +169,7 @@ test('手機邊緣右滑選單、焦點限制、Escape 與減少動態設定',as
     e.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[end]}));
   });
   const dialog=page.getByRole('dialog',{name:'工作範圍與編列版本'});await expect(dialog).toBeVisible();
-  expect((await dialog.boundingBox())!.x).toBe(0);
+  const panelBox=(await dialog.boundingBox())!;expect(Math.abs(panelBox.x+panelBox.width/2-195)).toBeLessThan(2);
   expect(await dialog.evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
   await expect(dialog.getByRole('button',{name:'返回首頁'})).toHaveCount(0);
   await dialog.getByRole('button',{name:'返回目前工作區 →',exact:true}).focus();await page.keyboard.press('Tab');
