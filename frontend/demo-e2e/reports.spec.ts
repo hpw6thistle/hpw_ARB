@@ -48,7 +48,7 @@ test('Excel 七張表、文字注入安全與大額保留精度',async({},info)=
 
 const origin=`http://127.0.0.1:${process.env.DEMO_TEST_PORT||5051}/`;
 async function finance(page:Page){
-  await page.goto('./');await page.getByRole('button',{name:'財務比較',exact:true}).click();
+  await page.goto('./');await page.getByLabel('首頁編列來源',{exact:true}).selectOption('finance');await page.getByRole('button',{name:'財務比較',exact:true}).click();
   await page.getByLabel('來源版本',{exact:true}).selectOption('1');await page.getByRole('button',{name:/建立財務調整草稿/}).click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeEnabled();
 }

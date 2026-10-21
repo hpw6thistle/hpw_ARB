@@ -239,3 +239,65 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .workspace-sheet span+span{padding-left:6px}
   .sheet-version{font-size:9px}
 }
+
+/* Shared green surfaces and plain bottom context. Red remains reserved for unavailable nights and submitted states. */
+:root{--brand:#3e6657;--line:#dce1dc;--ink:#2e423c}
+.v13-login{background:#f3f5f0;color:#395347}
+.v13-login-card{border-color:#d9e1d5;box-shadow:0 15px 50px #263d2a0c;border-radius:12px}
+.v13-login-card h1{color:#36594a}.v13-login-card>p,.v13-login-hint{color:#758270}
+.v13-login-mark,.v13-login-form button,.demo-welcome-actions button{background:#3e6657;color:#fff;border-color:#3e6657}
+.v13-login .eyebrow,.v13-login-form label{color:#6f8268}
+.v13-login-form input,.v13-login select{border:1px solid #cfdac9;background:#fff;color:#3f5c48}
+.entry-source{display:flex;flex-direction:column;gap:8px;margin-top:18px;font-size:12px;color:#617559}
+.entry-source select{width:100%;height:44px;border-radius:6px;padding:0 12px;font-size:14px}
+.v13-login .entry-description{font-size:12px;line-height:1.8;margin:14px 0 0;color:#73856a}
+.v13-app .room-setting{background:#f6f8f2;border-color:#dce4d6;color:#5f7555}
+.v13-app .room-setting label,.v13-app .room-setting small{color:#73856a}
+.v13-app .room-setting input{color:#3f5b43;background:#fff;border-color:#cbd8c4}
+.v13-app .ui-help,.v13-app .setting-summary .ui-help{border-color:#c4d0bc;background:#fff;color:#667f58}
+.v13-app .ui-help:hover,.v13-app .ui-help:focus-visible{border-color:#6e8a61;color:#3f6445;background:#f2f6ed}
+.help-text-trigger{width:auto;height:auto;border:0!important;border-radius:0;font-weight:400;padding:3px 0;font-size:11px;background:transparent!important}
+.help-dialog{position:fixed;inset:0;margin:auto;width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 40px);box-sizing:border-box;overflow:auto;border:1px solid #cdd9c4;border-radius:10px;padding:22px;background:#fff;color:#425b3d;box-shadow:0 15px 70px #182b1933;font-family:inherit}
+.help-dialog::backdrop{background:#26382a55}
+.help-dialog header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 0 13px;margin:0 0 12px;border-bottom:1px solid #e0e7da}
+.help-dialog h2{font-size:17px;font-weight:600;color:#3f6145;margin:0}
+.help-dialog button{flex:none;border:1px solid #d5dfcd;background:#f5f8ef;color:#547147;border-radius:5px;min-width:36px;min-height:36px;font-size:16px;cursor:pointer}
+.help-dialog-copy p{font-size:13px;font-weight:400;line-height:1.9;margin:10px 0;color:#66785c;white-space:normal;overflow-wrap:anywhere}
+.v13-app button.workspace-sheet{margin:0;padding:8px 0;background:transparent;border:0;border-radius:0;min-height:44px;font-weight:400;font-size:11px;color:#657760}
+.workspace-sheet span+span{border:0;padding-left:0}
+.v13-app .v13-principle-icon{background:#e6eedc;color:#5d7a50}
+.v13-app .v13-compare-heading p,.v13-app .v13-compare-principle p,.v13-app .v13-transfer-caption p,.v13-app .v13-metric-footnote,.v13-app .v13-selector-pane .muted,.v13-app .v13-period-select{color:#7a8870}
+.v13-app .v13-compare-principle strong,.v13-app .v13-pane-heading h3,.v13-app .v13-transfer-caption h3,.v13-app .v13-choice-body strong{color:#496241}
+.v13-app .v13-compare-choice .v13-choice-body small,.v13-app .v13-choice-check{color:#839379}
+.v13-app .v13-period-select select,.v13-app .v13-transfer-controls select{background:#fff;border-color:#d4decc;color:#54704b}
+.v13-app .v13-comparison-table tbody th{background:#f4f6ee;color:#526b48}
+.v13-app .v13-comparison-table th small,.v13-app .v13-comparison-table th span{color:#87957b}
+.v13-app .v13-comparison-table thead th{color:#4e6744}
+.finance-next-steps{max-width:1280px;margin:0 auto 14px;padding:15px 18px;border-left:3px solid #839b72;background:#edf3e6;color:#526d45;font-size:12px;line-height:1.9}
+.finance-next-steps p{margin:7px 0}.finance-next-steps small{font-size:11px;color:#78896b}
+.import-example{display:inline-block;margin-left:8px;font-size:12px;color:#788b6b;cursor:help}
+.import-example>span{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(330px,calc(100vw - 40px));box-sizing:border-box;padding:18px;border:1px solid #c9d6c1;border-radius:8px;background:#f8faf5;color:#516b46;font-size:12px;line-height:1.8;white-space:normal;z-index:100;box-shadow:0 12px 50px #263b2a33}
+.import-example:hover>span,.import-example:focus>span{display:block}
+@media(max-width:720px){
+  .v13-app .v13-comparison-table{min-width:0;width:max-content;table-layout:fixed}
+  .v13-app .v13-comparison-table th,.v13-app .v13-comparison-table td{min-width:126px;width:126px;max-width:126px;padding:12px 9px;font-size:12px}
+  .v13-app .v13-comparison-table th:first-child{min-width:88px;width:88px;max-width:88px;white-space:normal;overflow-wrap:anywhere}
+  .v13-app .v13-comparison-table th strong,.v13-app .v13-comparison-table th small,.v13-app .v13-comparison-table th span{display:block;white-space:normal;line-height:1.6;font-size:10px}
+  .v13-app .v13-comparison-table th strong{font-size:12px}
+  .v13-app .v13-comparison-table thead th:first-child>span{display:none}
+  .v13-app .v13-comparison-table tbody td{font-size:15px;white-space:nowrap}
+  .v13-app button.workspace-sheet{font-size:10px;padding-inline:0}
+}
+@media print{.help-dialog,.import-example>span{display:none!important}}
+.v13-app .v152-flow-row,.v13-app .setting-summary,.v13-app .setting-summary span,.v13-app .v13-file-mark{color:#7b8c70}
+.v13-app .v13-selector-pane,.v13-app .v13-metrics-pane,.v13-app .v13-comparison-scroll{border-color:#dce3d5}
+.v13-app .v13-comparison-table th,.v13-app .v13-comparison-table td{border-color:#dce3d5}
+.v13-app .v13-comparison-table tbody th strong{color:#526b48}
+.v13-app .v13-compare-placeholder{background:#f6f8f1;color:#7b8c70;border-color:#dce3d5}
+.v13-app .finance-next-steps{border:1px solid #d6e0ce;border-left:3px solid #839b72;background:#f4f7ef;box-shadow:none;border-radius:6px;padding:12px 16px}
+body:has(.help-dialog[open]){overflow:hidden}
+.v13-app .v13-inventory-panel .setting-summary{color:#5f7555!important}
+.v13-app .v13-file-title .import-example,.v13-app .v13-file-title .import-example>span{color:#788b6b}
+.v13-app .v13-comparison small,.v13-app .v13-comparison label,.v13-app .v13-choice-body span{color:#829374}
+.v13-app .v11-dropzone{border-color:#b8c9ac;color:#6c835d;background:#fafcf7}
+.v13-app .v11-dropzone input{border-color:#cbd8c4}

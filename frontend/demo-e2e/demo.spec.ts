@@ -13,8 +13,9 @@ test.afterEach(async({page})=>{expect(observed.get(page)).toEqual([]);});
 async function enter(page:Page,compare=false){
   await page.goto('./');
   await expect(page.locator('input[type=password]')).toHaveCount(0);
+  if(compare)await page.getByLabel('首頁編列來源',{exact:true}).selectOption('finance');
   await page.getByRole('button',{name:compare?'財務比較':'開始編列',exact:true}).click();
-  await expect(page.getByLabel('目前館別',{exact:true}).locator('option')).toHaveCount(12);
+  await expect(page.getByLabel('目前館別',{exact:true}).locator('option')).toHaveCount(compare?12:1);
 }
 async function menu(page:Page){
   if(!await page.getByRole('dialog',{name:'工作範圍與編列版本'}).isVisible())await page.getByRole('button',{name:'開啟工作選單',exact:true}).click();
@@ -40,7 +41,7 @@ test('子路徑開啟、匿名 12 館、無帳密與無 API／外部請求',asyn
   await enter(page);
   await expect(page.locator('body')).not.toContainText(/展示|試算|非正式核定資料/);
   const names=await page.getByLabel('目前館別',{exact:true}).locator('option').allTextContents();
-  expect(names).toEqual(Array.from({length:12},(_,i)=>`第 ${String(i+1).padStart(2,'0')} 館`));
+  expect(names).toEqual(['第 01 館']);
   await menu(page);await page.locator('.v13-version-card').first().click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
   await page.getByRole('button',{name:'開啟帳號與管理資訊'}).click();
@@ -136,9 +137,9 @@ test('首屏可編列、點擊說明、摘要即時更新且捲動後可見',asy
   await expect(rn).toBeEnabled();
   expect((await rn.boundingBox())!.y+(await rn.boundingBox())!.height).toBeLessThan(605);
   await expect(page.getByLabel('房間數',{exact:true})).toBeHidden();
-  await page.locator('.input-help > summary').click();
-  await expect(page.locator('.input-help')).toContainText('白底 R/N 與 AHR 可編輯');
-  await page.locator('.input-help > summary').click();
+  await page.getByRole('button',{name:'填寫說明',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'填寫說明',exact:true})).toContainText('白底 R/N');
+  await page.getByRole('button',{name:'關閉說明',exact:true}).click();
   const total=page.getByLabel('全年營收',{exact:true});
   const before=Number((await total.innerText()).replaceAll(',',''));
   const rate=Number(await page.getByLabel('1月 Retail:官網 ahr',{exact:true}).inputValue());
