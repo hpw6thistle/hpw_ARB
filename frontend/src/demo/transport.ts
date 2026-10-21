@@ -1,3 +1,5 @@
+import {syntheticLedger} from './pnl';
+import {patchLedger,TaxMode} from '../reports/pnl';
 import {State,Version,Kind,DemoError,need,seed,integer,inventory,versionInventory,calculate,checkCapacity,summary,segments} from './model';
 import {preview,template} from './excel';
 
@@ -63,7 +65,16 @@ export function createDemoTransport(){
         need(source.status==='submitted'&&source.kind!=='finance','僅能從已提交的各館／聯訂來源帶入',409);
         const v:Version={...clone(source),id:current.nextId++,kind:'finance',status:'draft',revision:0,created_by:'DEMO_VISITOR',source_id:source.id,
           snapshot:{source_id:source.id,source_revision:source.revision,inventory:clone(versionInventory(current,source)),lines:clone(source.lines)}};
-        current.versions.push(v);result=metadata(v);status=201;
+        current.versions.push(v);current.pnl??={};current.pnl[v.id]=syntheticLedger(v.snapshot!.lines);result=metadata(v);status=201;
+      }else if((match=path.match(/^\/api\/finance\/(\d+)\/pnl$/))){
+        const v=version(+match[1]);need(v.kind==='finance'&&v.snapshot,'非財務版本');
+        const ledger=current.pnl?.[v.id]??syntheticLedger(v.snapshot.lines);
+        if(method==='GET')result={revision:v.revision,ledger};
+        else if(method==='PUT'){
+          writable(v,body);need(Array.isArray(body.items)&&body.items.length<=2460,'損益項目過多');
+          let updated;try{updated=patchLedger(ledger,body.tax_mode as TaxMode,body.items);}catch(e){throw new DemoError(e instanceof Error?e.message:'損益輸入不合法');}
+          current.pnl??={};current.pnl[v.id]=updated;v.revision++;result={revision:v.revision,ledger:updated};
+        }else throw new DemoError('此操作不存在',404);
       }else if(method==='GET'&&path==='/api/finance/compare'){
         const h=hotel(Number(url.searchParams.get('hotel_id'))),y=year(url.searchParams.get('year'));
         result={hotel_id:h.id,year:y,versions:current.versions.filter(v=>v.hotel_id===h.id&&v.year===y).map(v=>({...metadata(v),...summary(current,v),source_revision:v.snapshot?.source_revision??null}))};
@@ -81,7 +92,7 @@ export function createDemoTransport(){
         }else if(method==='POST'&&action==='submit'){
           writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});checkCapacity(current,v);v.status='submitted';v.revision++;result=metadata(v);
         }else if(method==='DELETE'&&!action){
-          writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});current.versions=current.versions.filter(x=>x.id!==v.id);result={deleted:true,id:v.id};
+          writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});current.versions=current.versions.filter(x=>x.id!==v.id);if(current.pnl)delete current.pnl[v.id];result={deleted:true,id:v.id};
         }else throw new DemoError('此操作不存在',404);
       }else if(method==='GET'&&(match=path.match(/^\/api\/finance\/(\d+)\/snapshot$/))){
         const v=version(+match[1]);need(v.snapshot,'此版本沒有財務快照',404);result=v.snapshot;
@@ -93,7 +104,7 @@ export function createDemoTransport(){
       }
       return json(clone(result),status);
     }catch(e){
-      return json({detail:e instanceof DemoError?e.message:'展示資料格式不正確，請重新選擇或重設資料'},e instanceof DemoError?e.status:422);
+      return json({detail:e instanceof DemoError?e.message:'資料格式不正確，請重新選擇或重設資料'},e instanceof DemoError?e.status:422);
     }
   };
   return {transport,reset};

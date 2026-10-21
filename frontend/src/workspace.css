@@ -206,3 +206,19 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .annual-kpi>span{white-space:normal;min-height:27px}.annual-kpi>span small{display:block;margin-left:0}
 }
 @media(max-width:370px){.v13-app .work-navbar{column-gap:4px;grid-template-columns:auto minmax(0,1fr) 30px 30px}.work-nav-scope,.nav-version,.annual-kpi>span{font-size:9px}.v13-app .workspace-panel .v13-version-card{padding:10px;gap:4px}.v13-app .v13-budget-section .v13-section-head{flex-wrap:wrap}.work-editor-tools{margin-left:auto}}
+
+/* All unavailable-night controls share a muted red palette. */
+.v13-app .inventory-details .monthbox{background:#fff6f4;border-color:#e7cbc5;color:#99584f}
+.v13-app .inventory-details .monthbox strong{color:#91493f}
+.v13-app .inventory-details .monthbox small{color:#af766b}
+.v13-app .inventory-details .monthbox label{color:#99584f}
+.v13-app .inventory-details .monthbox input{border-color:#d7aaa1;color:#984c41;background:#fffdfc;accent-color:#a95b50}
+.v13-app .inventory-details .monthbox input:focus-visible{outline:2px solid #b16a5e;outline-offset:2px}
+/* Scope, year and version stay on the same information line. */
+.work-nav-context{flex-direction:row;align-items:center;gap:14px}
+.work-nav-context>div{display:contents}
+.work-nav-context h1{display:block;position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.work-nav-scope{font-size:11px}
+.finance-heading-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media(max-width:900px){.work-nav-context{flex-direction:row;align-items:center}.work-nav-scope{font-size:10px}}
+@media(max-width:370px){.work-nav-scope{font-size:9px}}

@@ -48,7 +48,7 @@ export function preview(data:Uint8Array){
     need(/^[A-D](?:[1-9]|[1-9]\d|10\d)$/.test(address)||value.trim()==='','範本應只有 4 欄、108 筆資料');
     need(!(address in cells),'重複儲存格');cells[address]=value.trim();
   }
-  need(['A1','B1','C1'].map(a=>cells[a]).join(',')==='month,channel,room_nights'&&['ahr','average_room_rate'].includes(cells.D1),'範本標題不符，請下載展示版範本');
+  need(['A1','B1','C1'].map(a=>cells[a]).join(',')==='month,channel,room_nights'&&['ahr','average_room_rate'].includes(cells.D1),'範本標題不符，請下載系統範本');
   const items:{month:number;channel:string;rn:number;ahr:string}[]=[],errors:string[]=[],keys=new Set<string>();
   for(let r=2;r<=109;r++){
     try{

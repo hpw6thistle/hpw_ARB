@@ -1,3 +1,4 @@
+import type {PnlLedger} from '../reports/pnl';
 // All data in this module is synthetic, independent of uploaded workbooks/seeds.
 export const segments = {Retail:['官網','國內網路','國外網路'],Corporate:['商務公司','其他'],Wholesale:['國旅','日旅','其他'],Other:['Walk In']};
 export const channels = Object.entries(segments).flatMap(([group,names])=>names.map(name=>`${group}:${name}`));
@@ -6,7 +7,7 @@ export type Inventory = {month:number;room_count:number;days:number;unavailable:
 export type Line = {month:number;channel:string;rn:number;ahr:string;rev:string};
 export type Kind = 'hotel'|'central'|'finance';
 export type Version = {id:number;hotel_id:number;year:number;kind:Kind;status:'draft'|'submitted';revision:number;created_by:string;source_id:number|null;lines:Line[];snapshot?:{source_id:number;source_revision:number;inventory:Inventory[];lines:Line[]}};
-export type State = {schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
+export type State = {pnl?:Record<number,PnlLedger>;schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
 export class DemoError extends Error {constructor(message:string, public status=422){super(message);}}
 export function need(condition:unknown,message:string,status=422):asserts condition {if(!condition)throw new DemoError(message,status);}
 export function integer(value:unknown, min=0, max=10_000_000):number {

@@ -14,7 +14,7 @@ const name=(kind:string)=>kind==='hotel'?'各館預算':kind==='central'?'聯訂
 const status=(value:string)=>value==='draft'?'草稿':value==='submitted'?'已提交':value;
 const format=(n:string|number|null|undefined,isPercent=false)=>n==null?'—':Number(n).toLocaleString('zh-TW',{maximumFractionDigits:3,minimumFractionDigits:0})+(isPercent?'%':'');
 
-export default function FinancialComparison({hotel,year,request,onCreateFinance,showNotes=true}:{showNotes?:boolean;hotel:number;year:number;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>;onCreateFinance:(id:number)=>Promise<void>}){
+export default function FinancialComparison({hotel,year,request,onCreateFinance,onOpenReports,showNotes=true}:{onOpenReports?:()=>void;showNotes?:boolean;hotel:number;year:number;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>;onCreateFinance:(id:number)=>Promise<void>}){
   const [versions,setVersions]=useState<FinanceVersion[]>([]);
   const [chosen,setChosen]=useState<number[]>([]);
   const [sourceId,setSourceId]=useState('');
@@ -55,7 +55,7 @@ export default function FinancialComparison({hotel,year,request,onCreateFinance,
   }
 
   return <section className="comparison-workspace v13-comparison">
-    <div className="v13-compare-heading"><div><span className="v13-kicker">FINANCE WORKSPACE</span><h2>財務版本比較與帶入</h2><p>將已提交的各館、聯訂預算與獨立財務調整版並排檢視。</p></div><button className="secondary" onClick={()=>void reload()} disabled={loading}>↻ 重新載入</button></div>
+    <div className="v13-compare-heading"><div><span className="v13-kicker">FINANCE WORKSPACE</span><h2>財務版本比較與帶入</h2><p>將已提交的各館、聯訂預算與獨立財務調整版並排檢視。</p></div><div className="finance-heading-actions">{onOpenReports&&<button onClick={onOpenReports}>報表輸出 →</button>}<button className="secondary" onClick={()=>void reload()} disabled={loading}>↻ 重新載入</button></div></div>
     <div className="v13-compare-principle"><span className="v13-principle-icon" aria-hidden="true">i</span><div><strong>財務口徑提醒</strong><p>各館與聯訂是同一飯店的兩套獨立預測，不能直接相加。財務版保留建立當時的來源及房間數／可售房晚快照，原版不受調整影響。</p></div></div>
     <div className="v13-compare-body">
       <div className="v13-selector-pane"><div className="v13-pane-heading"><div><span className="v13-kicker">STEP 01</span><h3>比較版本</h3></div><small>{chosen.length} / 4 已選取</small></div><p className="muted">勾選最多 4 份版本，右側即時顯示 KPI 對照。</p>

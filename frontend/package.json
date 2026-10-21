@@ -1,6 +1,6 @@
 {
   "name": "hotel-budget-anonymous-demo",
-  "version": "1.7.2-demo.0",
+  "version": "1.8.0-demo.0",
   "type": "module",
   "scripts": {
     "dev:demo": "vite --mode demo --host 127.0.0.1 --port 5051 --strictPort --open /demo.html",

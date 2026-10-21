@@ -1,0 +1,23 @@
+import {Report,change} from './model';
+import {taxNames} from './pnl';
+export type CellType='text'|'money'|'integer'|'percent'|'points';
+export type TableRow={cells:(string|number|null)[];total?:boolean;type?:CellType;formats?:CellType[];code?:string};
+export type ReportTable={name:string;title:string;columns:{label:string;type:CellType}[];rows:TableRow[]};
+export const cellType=(table:ReportTable,row:TableRow,c:number):CellType=>row.formats?.[c]??(c>0&&row.type?row.type:table.columns[c].type);
+export const stamp=(r:Report)=>new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(r.generatedAt));
+export function reportTables(r:Report):ReportTable[]{
+  const months=Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0')+' 月');
+  const matrix=[{label:'科目／指標',type:'text' as CellType},...months.map(label=>({label,type:'money' as CellType})),{label:'全年合計',type:'money' as CellType}];
+  const pnl:ReportTable={name:'客房部',title:'客房部損益表',columns:matrix,rows:r.pnl.map(p=>({cells:[(p.row.code?p.row.code+'：':'')+p.row.name,...p.months,p.annual],total:!!p.row.calc,code:p.row.code,type:p.row.calc==='ratio'?'percent':'money'}))};
+  const metrics:[string,keyof typeof r.annual,CellType][]=[['可售房晚','available','integer'],['銷售房晚 R/N','rn','integer'],['客房收入 REV（含稅）','rev','money'],['客房未稅收入（逐月合計）','net','money'],['平均房價 ADR','adr','money'],['住房率 OCC','occ','percent'],['每可售房晚收入 RevPAR','revpar','money']];
+  const income:ReportTable={name:'年度客房收入預算',title:'年度客房收入預算表',columns:matrix,rows:metrics.map(([label,key,type])=>({cells:[label,...r.monthly.map(m=>m[key]),r.annual[key]],type,total:key==='rev'||key==='net'}))};
+  const cols=(entries:[string,CellType][])=>entries.map(([label,type])=>({label,type}));
+  const details:ReportTable={name:'通路收入明細',title:'通路收入明細表',columns:cols([['月份','text'],['市場區隔','text'],['通路','text'],['R/N','integer'],['AHR','money'],['REV（含稅）','money'],['房晚占比','percent'],['收入占比','percent']]),rows:[...r.details,...r.annualChannels].map(d=>({cells:[d.month?months[d.month-1]:'全年',...d.channel.split(':'),d.rn,d.ahr,d.rev,d.rn_share,d.rev_share],total:d.month===0}))};
+  const variance:ReportTable={name:'收入調整差異',title:'財務調整前後收入差異',columns:cols([['期間','text'],['來源房晚','integer'],['調整後房晚','integer'],['房晚增減','integer'],['來源含稅收入','money'],['調整後含稅收入','money'],['含稅收入增減','money'],['調整後未稅收入','money'],['來源 ADR','money'],['調整後 ADR','money'],['來源 OCC','percent'],['調整後 OCC','percent'],['OCC 增減（百分點）','points']]),rows:[...r.monthly,r.annual].map((m,i)=>{const b=i===12?r.beforeAnnual:r.beforeMonthly[i];return {cells:[i===12?'全年':months[i],b.rn,m.rn,m.rn-b.rn,b.rev,m.rev,change(m.rev,b.rev),m.net,b.adr,m.adr,b.occ,m.occ,change(m.occ,b.occ)],total:i===12};})};
+  const pnlVariance:ReportTable={name:'損益調整差異',title:'損益調整前後年度差異',columns:cols([['科目','text'],['建立財務版時基準','money'],['調整後','money'],['增減','money']]),rows:r.pnl.filter(p=>p.row.calc||p.row.code==='8000101').map(p=>{const before=r.beforePnl.find(b=>b.row.row===p.row.row)!;return {cells:[p.row.name,before.annual,p.annual,change(p.annual,before.annual)],total:p.row.row===222,formats:p.row.calc==='ratio'?['text','percent','percent','points']:undefined};})};
+  const changes:ReportTable={name:'通路調整明細',title:'通路調整前後明細',columns:cols([['月份','text'],['市場區隔','text'],['通路','text'],['來源 R/N','integer'],['調整後 R/N','integer'],['R/N 增減','integer'],['來源 AHR','money'],['調整後 AHR','money'],['來源 REV','money'],['調整後 REV','money'],['REV 增減','money']]),rows:r.changes.map(c=>({cells:[months[c.month-1],...c.channel.split(':'),c.before.rn,c.after.rn,c.rn,c.before.ahr,c.after.ahr,c.before.rev,c.after.rev,c.rev]}))};
+  const info:ReportTable={name:'報表資訊',title:'報表來源與計算口徑',columns:cols([['項目','text'],['內容','text']]),rows:[
+    ['館別',r.hotelName],['年度',r.version.year],['財務版本',r.version.id],['版本修訂',r.version.revision],['版本狀態',r.version.status==='draft'?'草稿':'已提交'],['來源版本',r.source.source_id],['來源修訂',r.source.source_revision],['產製時間（台北）',stamp(r)],['所得稅方式',taxNames[r.ledger.tax_mode]],['收入', 'REV 為含稅；客房部 4000101 為各月 REV ÷ 1.05，ROUND_HALF_UP 至三位。'],['年度未稅收入','採逐月三位金額加總，與客房部一致。'],['全年一次除稅',r.netDirect],['逐月合計減全年一次除稅',r.netDifference],['年度指標','ADR、OCC、RevPAR 與營業成本率依全年分子／分母重算，不加總或平均月比率。'],['原檔差異','原檔年度營業成本率加總各月比率；本表依已確認的加權規則修正。'],['所得稅原檔規則','沿用原檔模式：1 月正數稅前損益 × 20%；其他月份使用輸入額，可另選逐月 20% 或手動。'],['其他科目','金額為未稅；未填列以 0 列報。退回／折讓若需抵減收入，請填負數。'],['來源快照','收入差異以帶入財務版當時的來源房晚及金額為準；損益差異以財務版初始科目基準為準。'],['精度','以十進位三位小數計算；超過 Excel 15 位有效數字的數值，以文字保存精度。'],['報表內容','為上述版本修訂的數值快照；修改 Excel 不會回寫網站。'],
+  ].map(cells=>({cells}))};
+  return [pnl,income,details,variance,pnlVariance,changes,info];
+}
