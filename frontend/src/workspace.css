@@ -122,3 +122,49 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .v13-app .v13-status-bar{padding:4px 10px;gap:5px;font-size:9px}.v13-app section.v13-comparison{padding:13px}.v13-app .v13-version-choices{grid-template-columns:1fr}.v13-app .toast-notice{top:70px}
 }
 @media(prefers-reduced-motion:reduce){.v13-app *,.v13-app *:before,.v13-app *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* v1.7.1: one aligned navigation row and one place for each action. */
+.v13-app .work-navbar{gap:24px;min-height:68px}
+.v13-app button.work-brand{display:block;flex:none;background:transparent;border:0;color:#344e3d;font-size:18px;font-weight:600;letter-spacing:.06em;padding:7px 0;min-height:44px;line-height:1.5;border-radius:0}
+.work-nav-tabs{margin-left:0}
+.v13-app .work-menu-trigger{display:grid;place-items:center;flex:none;margin-left:auto;width:44px;height:44px;min-height:44px;padding:0!important;border:0;background:transparent;color:#58715b;font-size:28px;line-height:1;border-radius:6px}
+.v13-app .work-account{min-height:44px}
+.v13-app .work-menu-trigger>span{display:inline!important}
+.v13-app .v152-flow-row{margin-top:10px;margin-bottom:0}
+.work-heading.work-hero{max-width:1280px;display:flex;justify-content:flex-start;align-items:center;gap:30px;margin:0 auto 9px;padding:10px 0}
+.work-hero>div{display:grid;grid-template-columns:auto auto;align-items:center;gap:3px 15px;min-width:0}
+.work-hero .eyebrow{order:0;letter-spacing:.035em;font-size:11px}
+.work-hero .eyebrow{grid-column:1/-1}
+.work-hero h1{font-size:21px;margin:0}
+.work-hero p{font-size:11px;color:#82907d;margin:0;padding-left:12px;border-left:1px solid #dce1d7}
+.work-hero>button{font-size:12px;min-height:40px;white-space:nowrap}
+.v13-app .v13-inventory-panel{max-width:1280px}
+.v13-app .v13-inventory-panel .setting-summary:hover>span:first-child{color:#4a6453!important}
+.v13-app .v13-inventory-panel .setting-summary:hover{background:transparent}
+.v13-app section.v13-budget-section{padding-top:12px}
+/* Stick the entire two-row header: no guessed second-row top offset. */
+.v13-app .budget-matrix{width:1688px;min-width:1688px;table-layout:fixed}
+.budget-matrix col.metric-col{width:120px}.budget-matrix col.channel-col{width:112px}
+.v13-app .budget-matrix thead{position:sticky;top:0;z-index:8;background:#eef1ea}
+.v13-app .budget-matrix thead th{position:static;top:auto;z-index:auto;height:auto!important;min-height:34px;vertical-align:middle;padding:9px 7px;isolation:auto}
+.v13-app .budget-matrix thead tr:nth-child(2) th{top:auto}
+.v13-app .budget-matrix thead th.fixed-col{position:sticky;left:0;top:auto;z-index:1;background:#eef1ea}
+.v13-app .vertical-scroll{overscroll-behavior:contain;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;overflow-anchor:none}
+.v13-app .budget-matrix .month-band th{padding:3px 9px}
+.month-summary{display:grid;grid-template-columns:78px 130px 150px 215px 130px 88px;align-items:center;gap:14px;width:max-content;min-height:28px;font-variant-numeric:tabular-nums}
+.v13-app .budget-matrix .month-summary .month-collapse{display:flex;align-items:center;gap:7px;width:78px;min-height:28px;padding:3px 0}
+.v13-app .budget-matrix .month-summary span{margin:0}
+.month-stat{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+.month-stat small{font-size:10px;color:#839077}.month-stat strong{font-size:11px;font-weight:500;color:#62765a}
+.v13-app .budget-matrix .month-summary>button:last-child{min-height:28px;white-space:nowrap}
+@media(max-width:720px){
+  .v13-app .work-navbar{gap:10px;min-height:60px}
+  .v13-app button.work-brand{font-size:16px;min-height:44px}
+  .v13-app .work-menu-trigger{font-size:27px;width:36px;height:44px;min-height:44px}
+  .v13-app .work-nav-tabs button{font-size:11px;padding:6px 7px}
+  .v13-app .work-account{width:32px;min-width:32px;justify-content:center}
+  .v13-app .v152-flow-row{margin-top:12px;margin-bottom:0}
+  .work-heading.work-hero{padding:13px 2px;margin-bottom:10px;gap:20px}.work-hero>div{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+  .work-hero h1{font-size:20px}.work-hero .eyebrow{display:block;font-size:10px}.work-hero p{font-size:10px;border:0;padding:0}.work-hero>button{font-size:11px;min-height:38px;padding:7px 10px}
+}
+@media(max-width:370px){.v13-app .work-navbar{gap:5px}.v13-app button.work-brand{font-size:14px}.v13-app .work-nav-tabs button{font-size:10px;padding:6px 5px}.v13-app .work-menu-trigger{width:30px}.work-heading.work-hero{gap:13px}}

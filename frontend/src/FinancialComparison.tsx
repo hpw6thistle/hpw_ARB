@@ -14,7 +14,7 @@ const name=(kind:string)=>kind==='hotel'?'各館預算':kind==='central'?'聯訂
 const status=(value:string)=>value==='draft'?'草稿':value==='submitted'?'已提交':value;
 const format=(n:string|number|null|undefined,isPercent=false)=>n==null?'—':Number(n).toLocaleString('zh-TW',{maximumFractionDigits:3,minimumFractionDigits:0})+(isPercent?'%':'');
 
-export default function FinancialComparison({hotel,year,request,onCreateFinance}:{hotel:number;year:number;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>;onCreateFinance:(id:number)=>Promise<void>}){
+export default function FinancialComparison({hotel,year,request,onCreateFinance,showNotes=true}:{showNotes?:boolean;hotel:number;year:number;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>;onCreateFinance:(id:number)=>Promise<void>}){
   const [versions,setVersions]=useState<FinanceVersion[]>([]);
   const [chosen,setChosen]=useState<number[]>([]);
   const [sourceId,setSourceId]=useState('');
@@ -68,6 +68,6 @@ export default function FinancialComparison({hotel,year,request,onCreateFinance}
       </div>
     </div>
     <div className="v13-finance-transfer"><div className="v13-transfer-caption"><span className="v13-kicker">STEP 03 / SOURCE SNAPSHOT</span><h3>帶入財務調整版</h3><p>選定一份已提交的來源預算，建立<strong>獨立</strong>的財務草稿與當下房間數／可售房晚快照。來源版本維持唯讀，不會被覆蓋。</p></div><div className="v13-transfer-controls"><label htmlFor="finance-source-select">來源版本<select id="finance-source-select" aria-label="來源版本" value={sourceId} onChange={e=>setSourceId(e.target.value)} disabled={!submitted.length||copying}><option value="">{submitted.length?'請選擇來源':'尚無已提交的來源'}</option>{submitted.map(v=><option value={v.id} key={v.id}>#{v.id} {name(v.kind)} · 已提交</option>)}</select></label><button disabled={!sourceId||copying} onClick={()=>void copySource()}>{copying?'正在建立…':'建立財務調整草稿 →'}</button></div></div>
-    <p className="muted v13-compare-disclaimer">正式財務核定、前年度資料與每月實績匯入尚未開放，需完成主管授權規則確認。</p>
+    <p hidden={!showNotes} className="muted v13-compare-disclaimer">正式財務核定、前年度資料與每月實績匯入尚未開放，需完成主管授權規則確認。</p>
   </section>;
 }

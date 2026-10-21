@@ -13,7 +13,7 @@ test.afterEach(async({page})=>{expect(observed.get(page)).toEqual([]);});
 async function enter(page:Page,compare=false){
   await page.goto('./');
   await expect(page.locator('input[type=password]')).toHaveCount(0);
-  await page.getByRole('button',{name:compare?'體驗財務比較':'體驗預算編列',exact:true}).click();
+  await page.getByRole('button',{name:compare?'財務比較':'開始編列',exact:true}).click();
   await expect(page.getByLabel('目前館別',{exact:true}).locator('option')).toHaveCount(12);
 }
 async function menu(page:Page){
@@ -22,6 +22,7 @@ async function menu(page:Page){
 async function draft(page:Page,y='2028'){
   await menu(page);
   await page.getByLabel('預算年度',{exact:true}).selectOption(y);
+  await page.getByRole('button',{name:'關閉工作選單',exact:true}).click();
   await page.getByRole('button',{name:/建立新草稿/}).click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeVisible();
 }
@@ -37,13 +38,13 @@ function fixture(change?:(xml:string)=>string,extra:Record<string,Uint8Array>={}
 test('子路徑開啟、匿名 12 館、無帳密與無 API／外部請求',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await enter(page);
-  await expect(page.getByRole('complementary',{name:'匿名展示版說明'})).toBeVisible();
+  await expect(page.locator('body')).not.toContainText(/展示|試算|非正式核定資料/);
   const names=await page.getByLabel('目前館別',{exact:true}).locator('option').allTextContents();
-  expect(names).toEqual(Array.from({length:12},(_,i)=>`第 ${String(i+1).padStart(2,'0')} 示範館`));
+  expect(names).toEqual(Array.from({length:12},(_,i)=>`第 ${String(i+1).padStart(2,'0')} 館`));
   await menu(page);await page.locator('.v13-version-card').first().click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
   await page.getByRole('button',{name:'開啟帳號與管理資訊'}).click();
-  await expect(page.getByRole('dialog')).toContainText('匿名展示訪客');
+  await expect(page.getByRole('dialog')).toContainText('目前資料保存在此瀏覽器分頁');
   await expect(page.locator('input[type=password]')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
@@ -58,7 +59,7 @@ test('精確金額、自動儲存、REV 覆寫、重新整理與提交唯讀',as
   await rev.locator('..').getByRole('checkbox').check();await rev.fill('9.000');await saved(page);
   state=await stored(page);v=state.versions.find((v:any)=>v.year===2028);
   expect(v.lines[0]).toMatchObject({ahr:'3.000',rev:'9.000'});
-  await page.reload();await page.getByRole('button',{name:'體驗預算編列',exact:true}).click();
+  await page.reload();await page.getByRole('button',{name:'開始編列',exact:true}).click();
   await menu(page);await page.getByLabel('預算年度',{exact:true}).selectOption('2028');
   await page.locator('.v13-version-card').first().click();await expect(rn).toHaveValue('3');
   await expect(page.getByLabel('1月 Retail:官網 ahr',{exact:true})).toHaveValue('3.000');
@@ -119,9 +120,9 @@ test('XLSX 下載／匯入與公式、外連、壓縮過大檔案拒絕',async({
 test('分頁隔離、重設與窄螢幕橫向表格',async({page,browser})=>{
   await enter(page);await draft(page);
   const context=await browser.newContext();const other=await context.newPage();await other.goto(page.url());
-  await expect(other.getByRole('button',{name:'體驗預算編列',exact:true})).toBeVisible();expect(await stored(other)).toBeNull();await context.close();
-  page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'重設示範資料',exact:true}).click();
-  await page.getByRole('button',{name:'體驗預算編列',exact:true}).click();
+  await expect(other.getByRole('button',{name:'開始編列',exact:true})).toBeVisible();expect(await stored(other)).toBeNull();await context.close();
+  page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'開啟帳號與管理資訊'}).click();await page.getByRole('button',{name:'重設資料',exact:true}).click();
+  await page.getByRole('button',{name:'開始編列',exact:true}).click();
   await menu(page);await page.getByLabel('預算年度',{exact:true}).selectOption('2028');await expect(page.locator('.v13-version-card')).toHaveCount(0);
   await page.getByLabel('預算年度',{exact:true}).selectOption('2027');await page.locator('.v13-version-card').last().click();
   await page.setViewportSize({width:390,height:844});
@@ -170,9 +171,52 @@ test('手機邊緣右滑選單、焦點限制、Escape 與減少動態設定',as
   const dialog=page.getByRole('dialog',{name:'工作範圍與編列版本'});await expect(dialog).toBeVisible();
   expect((await dialog.boundingBox())!.x).toBe(0);
   expect(await dialog.evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
-  await expect(dialog.getByRole('button',{name:'返回展示首頁'})).toHaveCount(0);
+  await expect(dialog.getByRole('button',{name:'返回首頁'})).toHaveCount(0);
   await dialog.getByRole('button',{name:'返回目前工作區 →',exact:true}).focus();await page.keyboard.press('Tab');
   expect(await dialog.evaluate(e=>e.contains(document.activeElement))).toBe(true);
   await page.keyboard.press('Escape');await expect(dialog).toBeHidden();await expect(button).toBeFocused();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+});
+
+test('導覽標題回首頁確認、單一三點選單與草稿 Hero 位置',async({page})=>{
+  await enter(page);
+  const nav=page.getByRole('navigation',{name:'主要導覽'});
+  const home=nav.getByRole('button',{name:'客房預算，返回首頁',exact:true});
+  expect(await nav.evaluate(e=>e.firstElementChild?.textContent)).toBe('客房預算');
+  await expect(nav.getByRole('button',{name:'開啟工作選單',exact:true})).toHaveText('⋯');
+  await expect(page.locator('.work-context')).toHaveCount(0);
+  await menu(page);await expect(page.getByRole('dialog',{name:'工作範圍與編列版本'}).getByRole('button',{name:/建立新草稿/})).toHaveCount(0);
+  await page.getByRole('button',{name:'關閉工作選單',exact:true}).click();
+  const flow=(await page.locator('.v152-flow-row').boundingBox())!,hero=(await page.locator('.work-hero').boundingBox())!;
+  const rooms=(await page.locator('.inventory-panel').boundingBox())!,budget=(await page.locator('.budget-section').boundingBox())!;
+  expect(hero.y).toBeGreaterThanOrEqual(flow.y+flow.height);expect(rooms.y).toBeGreaterThan(hero.y+hero.height);
+  expect(Math.abs(rooms.x-budget.x)).toBeLessThan(1);expect(Math.abs(rooms.width-budget.width)).toBeLessThan(1);
+  const title=page.locator('.setting-summary>span').first(),color=await title.evaluate(e=>getComputedStyle(e).color);
+  await page.locator('.setting-summary').hover();expect(await title.evaluate(e=>getComputedStyle(e).color)).toBe(color);
+  page.once('dialog',d=>d.dismiss());await home.click();await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeVisible();
+  page.once('dialog',d=>d.accept());await home.click();await expect(page.getByRole('button',{name:'開始編列',exact:true})).toBeVisible();
+});
+
+test('兩層表頭隨內容增高仍固定、原生滾輪與收合月份對齊',async({page})=>{
+  await page.setViewportSize({width:1366,height:900});await enter(page);
+  const grid=page.getByRole('region',{name:'月份與通路預算表'});
+  await grid.evaluate(e=>{e.style.scrollBehavior='auto';e.scrollTop=450;e.scrollLeft=210;});
+  await page.evaluate(()=>window.scrollBy(0,document.querySelector('.vertical-scroll')!.getBoundingClientRect().top-240));
+  const header=page.locator('.budget-matrix thead');
+  const regionBox=(await grid.boundingBox())!,headBox=(await header.boundingBox())!;
+  expect(Math.abs(headBox.y-regionBox.y-1)).toBeLessThan(2);
+  await header.locator('th').evaluateAll(cells=>cells.forEach(c=>(c as HTMLElement).style.fontSize='20px'));
+  const first=(await header.locator('tr').nth(0).boundingBox())!,second=(await header.locator('tr').nth(1).boundingBox())!;
+  expect(second.y).toBeGreaterThanOrEqual(first.y+first.height-1);
+  expect(await header.evaluate(e=>e.contains(document.elementFromPoint(100,e.getBoundingClientRect().y+12)))).toBe(true);
+  await header.locator('th').evaluateAll(cells=>cells.forEach(c=>(c as HTMLElement).style.removeProperty('font-size')));
+  const scrollY=await page.evaluate(()=>window.scrollY),before=await grid.evaluate(e=>e.scrollTop);
+  await page.mouse.move(regionBox.x+300,regionBox.y+170);await page.mouse.wheel(0,400);
+  await expect.poll(()=>grid.evaluate(e=>e.scrollTop)).toBeGreaterThan(before);
+  expect(await page.evaluate(()=>window.scrollY)).toBe(scrollY);
+  await page.getByRole('button',{name:'全部收合',exact:true}).click();
+  await expect(page.locator('.month-summary')).toHaveCount(12);
+  const columns=await page.locator('.month-summary').evaluateAll(rows=>rows.map(row=>Array.from(row.children).map(c=>Math.round(c.getBoundingClientRect().x))));
+  for(const row of columns)expect(row).toEqual(columns[0]);
+  await expect(page.locator('.month-collapse').first()).toContainText('01 月');await expect(page.locator('.month-collapse').last()).toContainText('12 月');
 });

@@ -22,10 +22,10 @@ export function createDemoTransport(){
     const path=url.pathname,method=options?.method?.toUpperCase()??'GET';
     // A private transaction copy ensures rejected bulk/inventory writes are atomic.
     const current=method==='GET'?state:clone(state);
-    const hotel=(id:number)=>{const h=current.hotels.find(h=>h.id===id);need(h,'示範館不存在',404);return h;};
-    const version=(id:number)=>{const v=current.versions.find(v=>v.id===id);need(v,'展示版本不存在',404);return v;};
+    const hotel=(id:number)=>{const h=current.hotels.find(h=>h.id===id);need(h,'館別不存在',404);return h;};
+    const version=(id:number)=>{const v=current.versions.find(v=>v.id===id);need(v,'版本不存在',404);return v;};
     const revision=(v:{revision:number},expected:unknown)=>need(v.revision===expected,'資料已更新，請重新載入',409);
-    const writable=(v:Version,p:{expected_revision?:number})=>{need(v.status==='draft','已提交展示版本不可修改',409);revision(v,p.expected_revision);};
+    const writable=(v:Version,p:{expected_revision?:number})=>{need(v.status==='draft','已提交版本不可修改',409);revision(v,p.expected_revision);};
     try{
       const body=typeof options?.body==='string'?JSON.parse(options.body):{};
       let result:unknown,status=200,match:RegExpMatchArray|null;
@@ -52,7 +52,7 @@ export function createDemoTransport(){
           item.available=h.room_count*item.days-item.unavailable;item.revision++;
           current.inventory[`${h.id}/${y}`]=inv;
           current.versions.filter(v=>v.hotel_id===h.id&&v.year===y&&v.kind!=='finance').forEach(v=>checkCapacity(current,v));result=item;
-        }else throw new DemoError('此展示操作不存在',404);
+        }else throw new DemoError('此操作不存在',404);
       }else if(method==='PUT'&&(match=path.match(/^\/api\/hotels\/(\d+)\/room-count$/))){
         const h=hotel(+match[1]);revision(h,body.expected_revision);h.room_count=integer(body.room_count,1,100000);h.revision++;
         const years=new Set([...current.versions.filter(v=>v.hotel_id===h.id).map(v=>v.year),...Object.keys(current.inventory).filter(k=>k.startsWith(`${h.id}/`)).map(k=>+k.split('/')[1])]);
@@ -82,13 +82,13 @@ export function createDemoTransport(){
           writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});checkCapacity(current,v);v.status='submitted';v.revision++;result=metadata(v);
         }else if(method==='DELETE'&&!action){
           writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});current.versions=current.versions.filter(x=>x.id!==v.id);result={deleted:true,id:v.id};
-        }else throw new DemoError('此展示操作不存在',404);
+        }else throw new DemoError('此操作不存在',404);
       }else if(method==='GET'&&(match=path.match(/^\/api\/finance\/(\d+)\/snapshot$/))){
         const v=version(+match[1]);need(v.snapshot,'此版本沒有財務快照',404);result=v.snapshot;
-      }else throw new DemoError('此展示操作未提供',404);
+      }else throw new DemoError('此操作未提供',404);
       if(method!=='GET'){
         try{sessionStorage.setItem(storageKey,JSON.stringify(current));}
-        catch{throw new DemoError('瀏覽器無法保存展示資料，請開啟分頁儲存權限或重設資料',507);}
+        catch{throw new DemoError('瀏覽器無法保存資料，請開啟分頁儲存權限或重設資料',507);}
         state=current;
       }
       return json(clone(result),status);
