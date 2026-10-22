@@ -1,6 +1,6 @@
 import {syntheticLedger} from './pnl';
 import {patchLedger,TaxMode} from '../reports/pnl';
-import {State,Version,Kind,DemoError,need,seed,integer,inventory,versionInventory,calculate,checkCapacity,summary,segments} from './model';
+import {State,Version,Kind,DemoError,need,seed,addPriorBudgets,integer,inventory,versionInventory,calculate,checkCapacity,summary,segments} from './model';
 import {preview,template} from './excel';
 
 const storageKey='hotel-budget-anonymous-demo-v1';
@@ -8,7 +8,7 @@ const clone=<T>(value:T):T=>JSON.parse(JSON.stringify(value));
 function restore():State {
   try{
     const raw=sessionStorage.getItem(storageKey);
-    if(raw){const saved=JSON.parse(raw);if(saved.schema===1&&saved.hotels?.length===12&&Array.isArray(saved.versions)&&saved.inventory&&Number.isSafeInteger(saved.nextId))return saved;}
+    if(raw){const saved=JSON.parse(raw);if(saved.schema===1&&saved.hotels?.length===12&&Array.isArray(saved.versions)&&saved.inventory&&Number.isSafeInteger(saved.nextId))return addPriorBudgets(saved);}
   }catch{/* Storage can be unavailable in private/embedded browser contexts. */}
   return seed();
 }

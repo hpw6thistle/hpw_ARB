@@ -7,7 +7,7 @@ test('首頁分工、各館範圍與聯訂草稿分開保存',async({page})=>{
   await expect(page.getByLabel('目前館別',{exact:true})).toHaveValue('2');await expect(page.getByLabel('目前館別',{exact:true}).locator('option')).toHaveCount(1);
   await expect(page.getByLabel('編列來源',{exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'關閉工作選單',exact:true}).click();await expect(page.getByRole('tab',{name:'財務比較與帶入',exact:true})).toBeDisabled();
-  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'客房預算，返回首頁',exact:true}).click();
+  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'年度客房預算，返回首頁',exact:true}).click();
   await page.getByLabel('首頁編列來源',{exact:true}).selectOption('central');await page.getByRole('button',{name:'開始編列',exact:true}).click();
   await expect(page.locator('.workspace-sheet')).toContainText('聯訂預算');await page.getByRole('button',{name:/建立新草稿/}).click();
   const created=await page.evaluate(()=>{const s=JSON.parse(sessionStorage.getItem('hotel-budget-anonymous-demo-v1')!);return s.versions[s.versions.length-1];});expect(created.kind).toBe('central');

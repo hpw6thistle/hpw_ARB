@@ -50,14 +50,14 @@ test('子路徑開啟、匿名 12 館、無帳密與無 API／外部請求',asyn
   expect(errors).toEqual([]);
 });
 
-test('精確金額、自動儲存、REV 覆寫、重新整理與提交唯讀',async({page})=>{
+test('精確金額、自動儲存、REV 自動計算、重新整理與提交唯讀',async({page})=>{
   page.on('dialog',d=>d.accept());await enter(page);await draft(page);
   const rn=page.getByLabel('1月 Retail:官網 rn',{exact:true});
   await rn.fill('3');await page.getByLabel('1月 Retail:官網 ahr',{exact:true}).fill('2.675');await saved(page);
   let state=await stored(page),v=state.versions.find((v:any)=>v.year===2028);
   expect(v.lines[0]).toMatchObject({rn:3,ahr:'2.675',rev:'8.025'});
   const rev=page.getByLabel('1月 Retail:官網 REV',{exact:true});
-  await rev.locator('..').getByRole('checkbox').check();await rev.fill('9.000');await saved(page);
+  await expect(rev).toBeDisabled();await expect(page.locator('.override')).toHaveCount(0);await page.getByLabel('1月 Retail:官網 ahr',{exact:true}).fill('3.000');await saved(page);
   state=await stored(page);v=state.versions.find((v:any)=>v.year===2028);
   expect(v.lines[0]).toMatchObject({ahr:'3.000',rev:'9.000'});
   await page.reload();await page.getByRole('button',{name:'開始編列',exact:true}).click();
@@ -182,8 +182,8 @@ test('手機邊緣右滑選單、焦點限制、Escape 與減少動態設定',as
 test('導覽標題回首頁確認、單一三點選單與草稿 Hero 位置',async({page})=>{
   await enter(page);
   const nav=page.getByRole('navigation',{name:'主要導覽'});
-  const home=nav.getByRole('button',{name:'客房預算，返回首頁',exact:true});
-  expect(await nav.evaluate(e=>e.firstElementChild?.textContent)).toBe('客房預算');
+  const home=nav.getByRole('button',{name:'年度客房預算，返回首頁',exact:true});
+  expect(await nav.evaluate(e=>e.firstElementChild?.textContent)).toBe('年度客房預算');
   await expect(nav.getByRole('button',{name:'開啟工作選單',exact:true})).toHaveText('⋯');
   await expect(page.locator('.work-context')).toHaveCount(0);
   await menu(page);await expect(page.getByRole('dialog',{name:'工作範圍與編列版本'}).getByRole('button',{name:/建立新草稿/})).toHaveCount(0);

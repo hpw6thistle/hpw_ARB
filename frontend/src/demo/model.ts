@@ -7,7 +7,7 @@ export type Inventory = {month:number;room_count:number;days:number;unavailable:
 export type Line = {month:number;channel:string;rn:number;ahr:string;rev:string};
 export type Kind = 'hotel'|'central'|'finance';
 export type Version = {id:number;hotel_id:number;year:number;kind:Kind;status:'draft'|'submitted';revision:number;created_by:string;source_id:number|null;lines:Line[];snapshot?:{source_id:number;source_revision:number;inventory:Inventory[];lines:Line[]}};
-export type State = {pnl?:Record<number,PnlLedger>;schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
+export type State = {priorBudgetsSeeded?:boolean;pnl?:Record<number,PnlLedger>;schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
 export class DemoError extends Error {constructor(message:string, public status=422){super(message);}}
 export function need(condition:unknown,message:string,status=422):asserts condition {if(!condition)throw new DemoError(message,status);}
 export function integer(value:unknown, min=0, max=10_000_000):number {
@@ -82,5 +82,22 @@ export function seed():State {
       state.versions.push({id:state.nextId++,hotel_id:hotel.id,year:2027,kind,status:isDraft?'draft':'submitted',revision:0,
         created_by:'DEMO_VISITOR',source_id:null,lines});
     }
-  }return state;
+  }return addPriorBudgets(state);
+}
+
+/** Anonymous prior-year budgets only; never import or infer actual hotel results. */
+export function addPriorBudgets(state:State):State {
+  if(state.priorBudgetsSeeded)return state;
+  state.nextId=Math.max(state.nextId,...state.versions.map(v=>v.id+1));
+  const weights=[18,22,12,15,8,12,6,4,3];
+  for(const hotel of state.hotels)for(const kind of ['hotel','central'] as const){
+    if(state.versions.some(v=>v.hotel_id===hotel.id&&v.year===2026&&v.kind===kind))continue;
+    const lines=inventory(state,hotel,2026).flatMap(inv=>channels.map((channel,c)=>{
+      const sold=Math.floor(inv.available*(49+(hotel.id+inv.month*2)%17+(kind==='central'?2:0))/100);
+      const rn=Math.floor(sold*weights[c]/100),ahr=1950+hotel.id*27+inv.month*41+c*79+(kind==='central'?110:0);
+      return calculate({month:inv.month,channel,rn,ahr:rn?String(ahr):'0'});
+    }));
+    state.versions.push({id:state.nextId++,hotel_id:hotel.id,year:2026,kind,status:'submitted',revision:0,created_by:'DEMO_VISITOR',source_id:null,lines});
+  }
+  state.priorBudgetsSeeded=true;return state;
 }

@@ -301,3 +301,33 @@ body:has(.help-dialog[open]){overflow:hidden}
 .v13-app .v13-comparison small,.v13-app .v13-comparison label,.v13-app .v13-choice-body span{color:#829374}
 .v13-app .v11-dropzone{border-color:#b8c9ac;color:#6c835d;background:#fafcf7}
 .v13-app .v11-dropzone input{border-color:#cbd8c4}
+
+/* Annual comparison is shared by all budget roles. */
+.nav-short-label{display:none}
+.v13-app section.year-comparison{max-width:1180px;margin:16px auto;padding:22px;border:1px solid #dce3d5;background:#fff;border-radius:9px;min-width:0}
+.year-basis,.year-empty{font-size:12px;line-height:1.8;color:#7b8b70;background:#f5f8ef;padding:12px 15px;border-radius:5px}
+.year-selectors{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:20px 0}
+.year-selectors label{display:flex;flex-direction:column;gap:8px;font-size:11px;color:#718467;flex:1 1 200px}
+.year-selectors select{width:100%;min-width:0;background:#fff;border:1px solid #d2ddca;color:#506c45;font-size:12px;height:42px}
+.year-comparison-scroll{max-height:65vh;overscroll-behavior:contain;border-color:#d9e2d0}
+.v13-app .year-comparison-table{border-collapse:separate;border-spacing:0;min-width:600px;width:100%;font-variant-numeric:tabular-nums}
+.v13-app .year-comparison-table th,.v13-app .year-comparison-table td{border:0;border-bottom:1px solid #e0e6d9;border-right:1px solid #e0e6d9;padding:13px 15px;color:#5c7251;background:#fff;white-space:nowrap}
+.v13-app .year-comparison-table thead{position:sticky;top:0;z-index:4}
+.v13-app .year-comparison-table thead th{background:#eaf0e2;font-size:13px}
+.year-comparison-table thead small{display:block;font-size:10px;font-weight:400;white-space:normal;color:#819171;margin-top:6px}
+.v13-app .year-comparison-table th:first-child{position:sticky;left:0;min-width:130px;width:130px;text-align:left;z-index:2;background:#f5f7f0;white-space:normal}
+.v13-app .year-comparison-table thead th:first-child{z-index:5;background:#eaf0e2}
+.year-comparison-table tbody th strong,.year-comparison-table tbody th small{display:block;line-height:1.7}.year-comparison-table tbody th strong{font-size:12px}.year-comparison-table tbody th small,.year-period{font-size:10px;color:#879778;font-weight:400}
+.year-period{display:block;margin-bottom:4px}.year-comparison-table .year-annual>*{background:#f3f7eb!important;font-weight:600}.year-comparison-table .year-period-start>*{border-top:2px solid #d5dfca}.year-comparison-table td.report-negative{color:#ad554b}
+@media(max-width:720px){
+ .nav-wide-label{display:none}.nav-short-label{display:inline}
+ .v13-app .work-nav-tabs{min-width:0;gap:0}.v13-app .work-nav-tabs button{padding-inline:5px;white-space:nowrap;font-size:10px}
+ .v13-app button.work-brand{font-size:15px;letter-spacing:0}
+ .v13-app section.year-comparison{padding:13px 11px}
+ .year-selectors{gap:12px}.year-selectors label{flex:1 1 100%}
+ .v13-app .year-comparison-table{min-width:0;width:max-content;table-layout:fixed}
+ .v13-app .year-comparison-table th,.v13-app .year-comparison-table td{width:120px;min-width:120px;max-width:120px;font-size:13px;padding:12px 9px}
+ .v13-app .year-comparison-table th:first-child{width:88px;min-width:88px;max-width:88px}
+ .v13-app .year-comparison-table thead th{font-size:12px;white-space:normal}
+}
+@media(max-width:370px){.v13-app button.work-brand{font-size:13px}.v13-app .work-nav-tabs button{font-size:9px;padding-inline:3px}}
