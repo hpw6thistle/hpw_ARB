@@ -52,7 +52,7 @@ async function finance(page:Page){
   await page.getByLabel('來源版本',{exact:true}).selectOption('1');await page.getByRole('button',{name:/建立財務調整草稿/}).click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeEnabled();
 }
-const stored=(page:Page)=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-anonymous-demo-v1')!));
+const stored=(page:Page)=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-preview-v2')!));
 test('財務調整立即儲存、完整損益編列、Excel／PDF 及提交鎖定',async({page},info)=>{
   const calls:string[]=[];page.on('request',r=>{if(r.url().includes('/api/')||!r.url().startsWith(origin))calls.push(r.url());});
   await finance(page);const before=await stored(page),fin=before.versions.find((v:any)=>v.kind==='finance');

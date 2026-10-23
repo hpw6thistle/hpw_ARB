@@ -8,7 +8,7 @@ test('年度住房率加權、除零、精確收入、缺月拒絕與歷史資�
  expect(yearDelta('20.000','25.125')).toBe('-5.125');expect(yearDelta('0.000',null)).toBeNull();expect(()=>yearFigures(months.slice(0,11))).toThrow('12 個月');
  expect(()=>yearFigures([...months.slice(0,11),months[0]])).toThrow('月份');
  const old=seed();delete old.priorBudgetsSeeded;old.versions=old.versions.filter(v=>v.year!==2026);const first=structuredClone(old.versions[0]);
- addPriorBudgets(old);expect(old.versions[0]).toEqual(first);const count=old.versions.length;addPriorBudgets(old);expect(old.versions).toHaveLength(count);expect(old.versions.filter(v=>v.year===2026)).toHaveLength(24);
+ addPriorBudgets(old);expect(old.versions[0]).toEqual(first);const count=old.versions.length;addPriorBudgets(old);expect(old.versions).toHaveLength(count);expect(old.versions.filter(v=>v.year===2026)).toHaveLength(2);
 });
 
 test('全年與同月對照、更新資料、手機欄寬與導覽標題',async({page})=>{
@@ -27,7 +27,7 @@ test('全年與同月對照、更新資料、手機欄寬與導覽標題',async(
 
 test('缺少去年版本以破折號呈現，不假設為零',async({page})=>{
  const state=seed();state.versions=state.versions.filter(v=>v.year!==2026);
- await page.addInitScript(s=>sessionStorage.setItem('hotel-budget-anonymous-demo-v1',JSON.stringify(s)),state);
+ await page.addInitScript(s=>sessionStorage.setItem('hotel-budget-preview-v2',JSON.stringify(s)),state);
  await page.goto('./');await page.getByRole('button',{name:'開始編列',exact:true}).click();await page.getByRole('tab',{name:'年度比較',exact:true}).click();
  await expect(page.getByRole('status').filter({hasText:'去年數字與增減'})).toBeVisible();const rows=page.getByRole('region',{name:'去年與今年預算對照',exact:true}).locator('tbody tr');await expect(rows).toHaveCount(52);
  for(const i of [0,1,2,3]){await expect(rows.nth(i).locator('td').nth(0)).toHaveText('—');await expect(rows.nth(i).locator('td').nth(2)).toHaveText('—');}
@@ -39,5 +39,5 @@ test('各館與聯訂不顯示覆寫，財務保留覆寫及三位小數回算',
  await page.getByRole('button',{name:'年度客房預算，返回首頁',exact:true}).click();await page.getByLabel('首頁編列來源',{exact:true}).selectOption('finance');await page.getByRole('button',{name:'財務比較',exact:true}).click();await page.getByLabel('來源版本',{exact:true}).selectOption('1');await page.getByRole('button',{name:/建立財務調整草稿/}).click();
  await page.getByLabel('1月 Retail:官網 rn',{exact:true}).fill('1');const rev=page.getByLabel('1月 Retail:官網 REV',{exact:true});await rev.locator('..').getByRole('checkbox').check();await rev.fill('123.125');await page.getByRole('button',{name:/儲存全部變更/}).click();
  await expect(page.getByLabel('1月 Retail:官網 ahr',{exact:true})).toHaveValue('123.125');
- const saved=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-anonymous-demo-v1')!).versions.find((v:any)=>v.kind==='finance').lines.find((l:any)=>l.month===1&&l.channel==='Retail:官網'));expect(saved).toMatchObject({rn:1,rev:'123.125',ahr:'123.125'});
+ const saved=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-preview-v2')!).versions.find((v:any)=>v.kind==='finance').lines.find((l:any)=>l.month===1&&l.channel==='Retail:官網'));expect(saved).toMatchObject({rn:1,rev:'123.125',ahr:'123.125'});
 });

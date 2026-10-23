@@ -27,7 +27,7 @@ async function draft(page:Page,y='2028'){
   await page.getByRole('button',{name:/建立新草稿/}).click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeVisible();
 }
-const stored=(page:Page)=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-anonymous-demo-v1')||'null'));
+const stored=(page:Page)=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('hotel-budget-preview-v2')||'null'));
 async function saved(page:Page){await expect(page.getByText(/尚未儲存 \d+ 個通路月份/)).toBeHidden({timeout:10000});}
 function fixture(change?:(xml:string)=>string,extra:Record<string,Uint8Array>={}){
   const rows=[['month','channel','room_nights','ahr'],...Array.from({length:12},(_,m)=>channels.map(c=>[String(m+1),c,'0','0'])).flat()];
@@ -36,12 +36,12 @@ function fixture(change?:(xml:string)=>string,extra:Record<string,Uint8Array>={}
   return Buffer.from(zipSync({'xl/worksheets/sheet1.xml':strToU8(xml),...extra}));
 }
 
-test('子路徑開啟、匿名 12 館、無帳密與無 API／外部請求',async({page})=>{
+test('子路徑開啟、12 館、無帳密與無 API／外部請求',async({page})=>{
   const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
   await enter(page);
   await expect(page.locator('body')).not.toContainText(/展示|試算|非正式核定資料/);
   const names=await page.getByLabel('目前館別',{exact:true}).locator('option').allTextContents();
-  expect(names).toEqual(['第 01 館']);
+  expect(names).toEqual(['西門']);
   await menu(page);await page.locator('.v13-version-card').first().click();
   await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
   await page.getByRole('button',{name:'開啟帳號與管理資訊'}).click();

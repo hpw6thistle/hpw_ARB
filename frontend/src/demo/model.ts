@@ -1,5 +1,6 @@
 import type {PnlLedger} from '../reports/pnl';
-// All data in this module is synthetic, independent of uploaded workbooks/seeds.
+// Hotel names are explicitly approved for this public preview; all financial data is synthetic.
+export const hotelNames = ["西門", "昆明", "博愛", "美麗島", "南西", "南東", "站前", "北門", "航空", "桃車", "真愛", "駁二"];
 export const segments = {Retail:['官網','國內網路','國外網路'],Corporate:['商務公司','其他'],Wholesale:['國旅','日旅','其他'],Other:['Walk In']};
 export const channels = Object.entries(segments).flatMap(([group,names])=>names.map(name=>`${group}:${name}`));
 export type Hotel = {id:number;code:string;name:string;room_count:number;revision:number};
@@ -69,9 +70,9 @@ export function checkCapacity(state:State,v:Version,lines=v.lines){
 }
 export function seed():State {
   const state:State={schema:1,hotels:Array.from({length:12},(_,i)=>({id:i+1,code:`D${String(i+1).padStart(2,'0')}`,
-    name:`第 ${String(i+1).padStart(2,'0')} 示範館`,room_count:80+i*7,revision:0})),inventory:{},versions:[],nextId:1};
+    name:hotelNames[i],room_count:80+i*7,revision:0})),inventory:{},versions:[],nextId:1};
   const weights=[18,22,12,15,8,12,6,4,3];
-  for(const hotel of state.hotels){
+  for(const hotel of state.hotels.filter(h=>h.id===1)){
     for(const kind of ['hotel','central','hotel'] as const){
       const isDraft=state.versions.some(v=>v.hotel_id===hotel.id&&v.kind===kind);
       const lines=inventory(state,hotel,2027).flatMap(inv=>channels.map((channel,c)=>{
@@ -90,7 +91,7 @@ export function addPriorBudgets(state:State):State {
   if(state.priorBudgetsSeeded)return state;
   state.nextId=Math.max(state.nextId,...state.versions.map(v=>v.id+1));
   const weights=[18,22,12,15,8,12,6,4,3];
-  for(const hotel of state.hotels)for(const kind of ['hotel','central'] as const){
+  for(const hotel of state.hotels.filter(h=>h.id===1))for(const kind of ['hotel','central'] as const){
     if(state.versions.some(v=>v.hotel_id===hotel.id&&v.year===2026&&v.kind===kind))continue;
     const lines=inventory(state,hotel,2026).flatMap(inv=>channels.map((channel,c)=>{
       const sold=Math.floor(inv.available*(49+(hotel.id+inv.month*2)%17+(kind==='central'?2:0))/100);

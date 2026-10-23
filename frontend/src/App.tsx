@@ -5,6 +5,7 @@ import VerticalBudget from './VerticalBudget';
 import WorkspacePanel from './WorkspacePanel';
 import InfoTip from './InfoTip';
 import YearComparison from './YearComparison';
+import {hotelNames} from './demo/model';
 
 type Hotel = {id:number; code:string; name:string; room_count:number; revision:number};
 type Inventory = {month:number; days:number; room_count:number; unavailable:number; available:number; revision:number};
@@ -17,7 +18,7 @@ type Mode = 'loading' | 'development' | 'legacy' | 'required' | 'error';
 const API = import.meta.env.MODE==='demo'?'':(import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://127.0.0.1:8000' : ''));
 const years = Array.from({length:15}, (_,index)=>2025+index);
 const kindName = (kind:string) => kind==='hotel'?'各館':kind==='central'?'聯訂':'財務調整';
-const hotelName=(name?:string)=>name?.replace('示範館','館')||'選擇館別';
+const hotelName=(name?:string)=>name||'選擇館別';
 const statusName = (status:string) => status==='draft'?'草稿':status==='submitted'?'已提交':status;
 
 export default function App({demo=false, transport=fetch, onDemoReset}:{demo?:boolean; transport?:typeof fetch; onDemoReset?:()=>void}) {
@@ -352,7 +353,7 @@ export default function App({demo=false, transport=fetch, onDemoReset}:{demo?:bo
     <span className="eyebrow">ANNUAL ROOM BUDGET</span><div className="v13-login-mark">HB</div>
     <h1>年度客房預算</h1><p>管理各館年度預算，進行收入編列、Excel 匯入與財務比較。</p>
     {sourcePicker}
-    {entrySource==='hotel'&&<label className="entry-source">館別<select aria-label="首頁館別" value={entryHotel} onChange={e=>setEntryHotel(Number(e.target.value))}>{Array.from({length:12},(_,i)=><option value={i+1} key={i}>第 {String(i+1).padStart(2,'0')} 館</option>)}</select></label>}
+    {entrySource==='hotel'&&<label className="entry-source">館別<select aria-label="首頁館別" value={entryHotel} onChange={e=>setEntryHotel(Number(e.target.value))}>{Array.from({length:12},(_,i)=><option value={i+1} key={i}>{hotelNames[i]}</option>)}</select></label>}
     <p className="entry-description">{entrySource==='hotel'?'負責所屬館別的客房收入預算。':entrySource==='central'?'編列聯訂預算，與各館版本分開保存。':'比較已提交預算、調整收入與費用，並輸出損益報表。'}</p>
     <div className="demo-welcome-actions"><button disabled={loggingIn} onClick={enterDemo}>{entrySource==='finance'?'財務比較':'開始編列'}</button></div>
 
@@ -362,7 +363,7 @@ export default function App({demo=false, transport=fetch, onDemoReset}:{demo?:bo
   return <main className="erp-app v11-app v13-app">
     <nav className="work-navbar" aria-label="主要導覽">
       <button className="work-brand" aria-label="年度客房預算，返回首頁" onClick={()=>{if(window.confirm('是否回到首頁？尚未儲存的內容將不會保留。'))logout();}}>年度客房預算</button>
-      <div className="work-nav-tabs" role="tablist" aria-label="工作區切換"><button role="tab" aria-selected={workspace==='edit'} disabled={editorPending||versionLoading} onClick={()=>setWorkspace('edit')}>預算編列</button><button role="tab" aria-label="財務比較與帶入" aria-selected={workspace==='compare'||workspace==='reports'} disabled={!canCompare||editorPending} onClick={()=>{setWorkspace('compare');setCompareReload(n=>n+1);}}> <span className="nav-wide-label">財務比較與帶入</span><span className="nav-short-label">財務比較</span></button><button role="tab" aria-selected={workspace==='yearly'} disabled={editorPending||versionLoading} onClick={()=>setWorkspace('yearly')}>年度比較</button></div>
+      <div className="work-nav-tabs" role="tablist" aria-label="工作區切換"><button role="tab" aria-selected={workspace==='edit'} disabled={editorPending||versionLoading} onClick={()=>setWorkspace('edit')}>預算編列</button>{canCompare&&<button role="tab" aria-label="財務比較與帶入" aria-selected={workspace==='compare'||workspace==='reports'} disabled={!canCompare||editorPending} onClick={()=>{setWorkspace('compare');setCompareReload(n=>n+1);}}> <span className="nav-wide-label">財務比較與帶入</span><span className="nav-short-label">財務比較</span></button>}<button role="tab" aria-selected={workspace==='yearly'} disabled={editorPending||versionLoading} onClick={()=>setWorkspace('yearly')}>年度比較</button></div>
       <button className="work-menu-trigger secondary" disabled={editorPending||versionLoading} aria-label="開啟工作選單" title="工作範圍與編列版本" aria-haspopup="dialog" aria-expanded={scopeOpen} onClick={()=>setScopeOpen(true)}><span aria-hidden="true">⋯</span></button>
       <button ref={triggerRef} className="work-account secondary" onClick={()=>setDrawerOpen(true)} aria-label="開啟帳號與管理資訊" aria-haspopup="dialog" aria-expanded={drawerOpen}><span className="v13-avatar" aria-hidden="true">{emp.slice(0,1).toUpperCase()}</span><span className="work-account-label">{demo?'使用者':emp}</span></button>
     </nav>
