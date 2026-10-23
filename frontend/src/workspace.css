@@ -328,7 +328,13 @@ body:has(.help-dialog[open]){overflow:hidden}
 }
 @media(max-width:370px){.v13-app button.work-brand{font-size:13px}.v13-app .work-nav-tabs button{font-size:9px;padding-inline:3px}}
 
-/* Non-blocking account-scoped continuation context. */
-.resume-strip{max-width:1120px;margin:14px auto 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#eef3ed;border:1px solid #d6e0d4;border-radius:8px;color:#365447}
-.resume-strip strong{font-size:14px;font-weight:600}.resume-strip p{margin:5px 0;font-size:13px;line-height:1.6;overflow-wrap:anywhere}.resume-strip small{color:#657466;font-size:12px;line-height:1.6}.resume-strip button{flex-shrink:0}
-@media(max-width:600px){.resume-strip{padding:12px;gap:10px;align-items:flex-start}.resume-strip button{font-size:12px;padding:8px 10px}.resume-strip p{font-size:12px}}
+/* Compact continuation context, aligned to the right without a panel surface. */
+.v13-app section.resume-strip{flex:1;min-width:0;max-width:1280px;margin:0 0 0 auto;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;justify-content:flex-end;align-items:baseline;gap:10px;color:#6b7c70}
+.v13-app .resume-strip>div{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:3px 12px;min-width:0}
+.v13-app .resume-strip strong{font-size:11px;font-weight:400;color:#718074}
+.v13-app .resume-strip p{margin:0;padding:0;border:0;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.v13-app .resume-strip small{font-size:10.5px;line-height:1.6;color:#7b877b}
+.v13-app .resume-strip button.secondary{flex-shrink:0;min-height:28px;padding:3px 2px;background:transparent;border:0;border-radius:0;box-shadow:none;font-size:11px;font-weight:400;color:#466654}
+.v13-app .resume-strip button.secondary:hover{background:transparent;color:#294c3b;text-decoration:underline}
+.v13-app .work-heading.work-hero{justify-content:space-between;gap:16px}
+@media(max-width:600px){.v13-app section.resume-strip{margin-top:16px;gap:8px;align-items:flex-start}.v13-app .resume-strip>div{gap:2px 8px}.v13-app .resume-strip p{font-size:11px}.v13-app .resume-strip button.secondary{margin-top:-2px}}
