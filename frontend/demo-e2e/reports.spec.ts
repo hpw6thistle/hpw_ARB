@@ -84,7 +84,7 @@ test('損益無效輸入阻擋匯出、還原及手機紅色房晚區／接續�
   const palette=await page.locator('.inventory-details .monthbox').first().evaluate(e=>({bg:getComputedStyle(e).backgroundColor,border:getComputedStyle(e).borderColor,text:getComputedStyle(e.querySelector('strong')!).color}));expect(palette).toEqual({bg:'rgb(255, 246, 244)',border:'rgb(231, 203, 197)',text:'rgb(145, 73, 63)'});
   await expect(page.locator('.work-nav-context')).toHaveCount(0);
   await expect(page.getByRole('region',{name:'目前工作表',exact:true})).toHaveCount(0);
-  await expect(page.getByRole('region',{name:'接續編列資訊',exact:true})).toContainText('2027 年');
-  await expect(page.getByRole('region',{name:'接續編列資訊',exact:true})).toContainText('財務調整預算');
+  await expect(page.getByRole('region',{name:'接續編列資訊',exact:true})).not.toContainText('2027 年');
+  await expect(page.getByRole('region',{name:'接續編列資訊',exact:true})).not.toContainText('財務調整預算');
   await page.getByRole('button',{name:'儲存並預覽報表',exact:true}).click();await page.setViewportSize({width:390,height:844});await expect(page.getByRole('region',{name:'客房部損益表',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
 });
