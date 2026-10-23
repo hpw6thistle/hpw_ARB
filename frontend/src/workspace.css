@@ -95,7 +95,6 @@ body{background:#f5f6f3;color:var(--work-ink)}
 .v13-app .workspace-panel .v13-version-card.active{background:#eff4e9;border-color:#809475;box-shadow:none}.v13-app .workspace-panel .v13-version-card strong{font-size:12px}.workspace-panel .v13-version-id{font-size:10px;color:#8a9781}
 .workspace-panel .v13-version-actions{gap:8px;flex-wrap:wrap;display:flex}.workspace-panel .v13-version-actions button{font-size:11px;padding:6px 10px;min-height:32px}.workspace-panel .v13-current-version{font-size:11px;color:#7a8770}
 .workspace-panel .work-continue{display:block;margin:22px 0 0 auto;font-size:12px;padding:9px 16px}
-.v13-app .v13-status-bar{background:#f8f9f6;color:#87917f;border-color:#e0e5da;font-size:10px;min-height:28px;padding:4px 22px;gap:9px}.v13-status-bar .status-dot{background:#7e9a71;width:5px;height:5px}
 .v13-app .v11-drawer{z-index:70}.v13-app .toast-notice{top:78px}
 .v13-app .v13-empty-state{max-width:680px;margin:25px auto;padding:30px;background:#fafbf8;border-color:#d9e1d2;color:#63745c}.v13-empty-state button{display:block;margin:15px auto 0}.v13-empty-state p{font-size:12px}
 /* Comparison shares the quieter surface; its table keeps a different width. */
@@ -114,8 +113,7 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .annual-kpis{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:12px}.annual-kpi{padding:0 8px;gap:4px}.annual-kpi-primary{grid-column:span 2}.annual-kpi:nth-child(3){border:0;padding-left:0}.annual-kpi>span{font-size:10px}.annual-kpi>span small{font-size:8px;margin-left:3px}.annual-kpi output{font-size:clamp(12px,4.5cqw,17px)}.annual-kpi-primary output{font-size:clamp(17px,6cqw,24px)}.annual-kpi meter{width:80%;margin-top:0}
   .v13-app .vertical-toolbar{align-items:center;gap:8px}.grid-heading{gap:6px}.v13-app .vertical-toolbar b{font-size:11px}.input-help{font-size:10px}.grid-toolbar-actions{width:100%;justify-content:flex-end}.v13-app .grid-toolbar-actions button{font-size:10px;min-height:30px;padding:5px 8px}.input-help>div{left:auto;right:-80px;width:280px;font-size:11px}.v13-app .vertical-scroll{max-height:58vh}
   .v13-app .v13-submit-bar{gap:9px;align-items:center}.v13-submit-bar strong{font-size:11px}.v13-submit-bar p{font-size:10px;max-width:185px;line-height:1.5}.v13-submit-bar button{font-size:11px;padding:9px}
-  .workspace-panel{inset:0 auto 0 0;width:min(350px,90vw);max-height:none;height:100dvh;border:0;border-radius:0}.workspace-panel[open]{animation:work-slide .22s ease-out}.workspace-panel-inner{padding:20px 16px}.workspace-panel-heading h2{font-size:16px}.v13-app .workspace-panel .v13-filters{grid-template-columns:1fr 1fr;gap:12px}.workspace-panel .v13-filters>label:first-of-type{grid-column:1/-1}.v13-app .workspace-panel .v13-version-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:43vh}.v13-app .workspace-panel .v13-version-card{padding:10px}.workspace-panel .v13-current-version{width:100%}.workspace-panel .v13-section-head{gap:8px}.workspace-panel .v13-section-head button{font-size:10px;padding:5px 7px}.workspace-panel .v13-section-head h2{font-size:13px}.workspace-panel .ui-help-bubble{right:auto;left:0;transform:none}
-  .v13-app .v13-status-bar{padding:4px 10px;gap:5px;font-size:9px}.v13-app section.v13-comparison{padding:13px}.v13-app .v13-version-choices{grid-template-columns:1fr}.v13-app .toast-notice{top:70px}
+  .workspace-panel{inset:0 auto 0 0;width:min(350px,90vw);max-height:none;height:100dvh;border:0;border-radius:0}.workspace-panel[open]{animation:work-slide .22s ease-out}.workspace-panel-inner{padding:20px 16px}.workspace-panel-heading h2{font-size:16px}.v13-app .workspace-panel .v13-filters{grid-template-columns:1fr 1fr;gap:12px}.workspace-panel .v13-filters>label:first-of-type{grid-column:1/-1}.v13-app .workspace-panel .v13-version-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:43vh}.v13-app .workspace-panel .v13-version-card{padding:10px}.workspace-panel .v13-current-version{width:100%}.workspace-panel .v13-section-head{gap:8px}.workspace-panel .v13-section-head button{font-size:10px;padding:5px 7px}.workspace-panel .v13-section-head h2{font-size:13px}.workspace-panel .ui-help-bubble{right:auto;left:0;transform:none}.v13-app section.v13-comparison{padding:13px}.v13-app .v13-version-choices{grid-template-columns:1fr}.v13-app .toast-notice{top:70px}
 }
 @media(prefers-reduced-motion:reduce){.v13-app *,.v13-app *:before,.v13-app *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
@@ -213,27 +211,12 @@ body{background:#f5f6f3;color:var(--work-ink)}
 .v13-app .work-navbar .work-account{color:#eff5ed;background:transparent}
 .work-account .v13-avatar{background:#507062;color:#fff}
 .v13-app .work-navbar button:focus-visible{outline:2px solid #e4edc9;outline-offset:2px}
-.v13-app .v13-status-bar{z-index:46;min-height:48px;gap:12px;padding:0 20px env(safe-area-inset-bottom,0px);background:#e8ede6;border-top:1px solid #ced8cc;color:#657760}
-.v13-app button.workspace-sheet{display:flex;align-items:center;gap:12px;flex:none;align-self:stretch;margin-top:5px;padding:8px 15px;background:#fff;color:#3e614b;border:1px solid #cbd7c7;border-bottom:3px solid #52775b;border-radius:7px 7px 0 0;font-size:12px;white-space:nowrap;min-height:42px}
-.workspace-sheet span+span{border-left:1px solid #dce4d7;padding-left:12px}
-.sheet-version{font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
-.sheet-version.submitted{color:#a7473e}
-.sheet-release,.sheet-storage{font-size:10px}
-.v13-app{padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))}
+.v13-app{padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
 @media(max-width:900px){
   .v13-app .work-nav-tabs{margin-left:0;gap:0}
-  .v13-app .v13-status-bar{padding-inline:10px;gap:10px}
-  .v13-app button.workspace-sheet{font-size:11px;padding:8px 10px;gap:8px}
-  .workspace-sheet span+span{padding-left:8px}
-  .sheet-version{font-size:10px}
-  .sheet-release,.sheet-storage,.v13-status-bar .status-spacer{display:none}
 }
 @media(max-width:370px){
   .v13-app .work-nav-tabs button{font-size:9px;padding-inline:3px}
-  .v13-app .v13-status-bar{padding-inline:6px;gap:7px}
-  .v13-app button.workspace-sheet{font-size:10px;padding-inline:7px;gap:6px}
-  .workspace-sheet span+span{padding-left:6px}
-  .sheet-version{font-size:9px}
 }
 
 /* Shared green surfaces and plain bottom context. Red remains reserved for unavailable nights and submitted states. */
@@ -259,8 +242,6 @@ body{background:#f5f6f3;color:var(--work-ink)}
 .help-dialog h2{font-size:17px;font-weight:600;color:#3f6145;margin:0}
 .help-dialog button{flex:none;border:1px solid #d5dfcd;background:#f5f8ef;color:#547147;border-radius:5px;min-width:36px;min-height:36px;font-size:16px;cursor:pointer}
 .help-dialog-copy p{font-size:13px;font-weight:400;line-height:1.9;margin:10px 0;color:#66785c;white-space:normal;overflow-wrap:anywhere}
-.v13-app button.workspace-sheet{margin:0;padding:8px 0;background:transparent;border:0;border-radius:0;min-height:44px;font-weight:400;font-size:11px;color:#657760}
-.workspace-sheet span+span{border:0;padding-left:0}
 .v13-app .v13-principle-icon{background:#e6eedc;color:#5d7a50}
 .v13-app .v13-compare-heading p,.v13-app .v13-compare-principle p,.v13-app .v13-transfer-caption p,.v13-app .v13-metric-footnote,.v13-app .v13-selector-pane .muted,.v13-app .v13-period-select{color:#7a8870}
 .v13-app .v13-compare-principle strong,.v13-app .v13-pane-heading h3,.v13-app .v13-transfer-caption h3,.v13-app .v13-choice-body strong{color:#496241}
@@ -282,7 +263,6 @@ body{background:#f5f6f3;color:var(--work-ink)}
   .v13-app .v13-comparison-table th strong{font-size:12px}
   .v13-app .v13-comparison-table thead th:first-child>span{display:none}
   .v13-app .v13-comparison-table tbody td{font-size:15px;white-space:nowrap}
-  .v13-app button.workspace-sheet{font-size:10px;padding-inline:0}
 }
 @media print{.help-dialog,.import-example>span{display:none!important}}
 .v13-app .v152-flow-row,.v13-app .setting-summary,.v13-app .setting-summary span,.v13-app .v13-file-mark{color:#7b8c70}
@@ -338,3 +318,5 @@ body:has(.help-dialog[open]){overflow:hidden}
 .v13-app .resume-strip button.secondary:hover{background:transparent;color:#294c3b;text-decoration:underline}
 .v13-app .work-heading.work-hero{justify-content:space-between;gap:16px}
 @media(max-width:600px){.v13-app section.resume-strip{margin-top:16px;gap:8px;align-items:flex-start}.v13-app .resume-strip>div{gap:2px 8px}.v13-app .resume-strip p{font-size:11px}.v13-app .resume-strip button.secondary{margin-top:-2px}}
+
+.account-build{display:block;margin:4px 0 12px;font-size:11px;color:#718074}

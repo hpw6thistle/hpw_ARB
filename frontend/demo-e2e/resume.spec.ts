@@ -8,6 +8,8 @@ test('2.1 接續提示、儲存時間、重新進入與來源隔離，不呼叫�
  const strip=page.getByRole('region',{name:'接續編列資訊',exact:true});await expect(strip).toContainText('台北時間');await expect(strip).toContainText('2029 年');
  await page.reload();await enter(page);await expect(strip).toContainText('2029 年');await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toHaveValue('3');
  await expect(page.locator('.work-steps [aria-current="step"]')).toContainText('02');
+ await expect(page.locator('.app-status-bar')).toHaveCount(0);
+ await page.getByRole('button',{name:'填寫說明',exact:true}).click();await expect(page.getByRole('dialog',{name:'填寫說明',exact:true})).toContainText('多格貼上支援從 Excel');await page.keyboard.press('Escape');
  await page.screenshot({path:info.outputPath('resume-compact-desktop.png')});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:info.outputPath('resume-compact-mobile.png')});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
  await page.getByRole('button',{name:'提交此版本 →',exact:true}).click();await page.reload();await enter(page);await expect(page.locator('.work-steps [aria-current="step"]')).toContainText('03');await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
