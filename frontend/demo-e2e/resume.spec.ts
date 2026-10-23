@@ -12,6 +12,9 @@ test('2.1 接續提示、儲存時間、重新進入與來源隔離，不呼叫�
  await page.getByRole('button',{name:'填寫說明',exact:true}).click();await expect(page.getByRole('dialog',{name:'填寫說明',exact:true})).toContainText('多格貼上支援從 Excel');await page.keyboard.press('Escape');
  await page.screenshot({path:info.outputPath('resume-compact-desktop.png')});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:info.outputPath('resume-compact-mobile.png')});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2)).toBe(true);
+ await page.locator('.vertical-toolbar').scrollIntoViewIfNeeded();
+ await expect(page.getByRole('button',{name:'填寫說明',exact:true})).toBeInViewport();
+ await page.getByRole('button',{name:'填寫說明',exact:true}).click();await expect(page.getByRole('dialog',{name:'填寫說明',exact:true})).toBeVisible();await page.keyboard.press('Escape');
  await page.getByRole('button',{name:'提交此版本 →',exact:true}).click();await page.reload();await enter(page);await expect(page.locator('.work-steps [aria-current="step"]')).toContainText('03');await expect(page.getByLabel('1月 Retail:官網 rn',{exact:true})).toBeDisabled();
  await page.reload();await enter(page,false);await expect(strip).not.toContainText('2029 年');await expect(page.locator('input[type=password]')).toHaveCount(0);expect(calls).toEqual([]);
 });

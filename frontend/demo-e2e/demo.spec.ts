@@ -151,8 +151,14 @@ test('首屏接續提示、編列可達、點擊說明與摘要即時更新',asy
   await rn.fill(String(Number(await rn.inputValue())+1));
   await expect(total).toHaveText((before+rate).toLocaleString('zh-TW',{minimumFractionDigits:3,maximumFractionDigits:3}));
   await page.getByRole('region',{name:'月份與通路預算表'}).evaluate(e=>e.scrollTop=e.scrollHeight);
-  await page.evaluate(()=>window.scrollTo(0,470));
+  await page.evaluate(()=>window.scrollBy(0,document.querySelector('.annual-summary')!.getBoundingClientRect().top-document.querySelector('.work-navbar')!.getBoundingClientRect().height-16));
   const box=(await page.getByRole('region',{name:'全年即時預算摘要'}).boundingBox())!;
+  const toolbar=page.locator('.vertical-toolbar'),toolbarBox=(await toolbar.boundingBox())!;
+  expect(toolbarBox.y).toBeGreaterThanOrEqual(box.y+box.height+12);
+  const title=page.locator('.grid-heading b');expect(await title.evaluate(e=>{const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2));})).toBe(true);
+  await page.locator('.vertical-toolbar').evaluate(e=>window.scrollBy(0,e.getBoundingClientRect().top-document.querySelector('.work-navbar')!.getBoundingClientRect().height-16));
+  expect(await title.evaluate(e=>{const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2));})).toBe(true);
+  await page.screenshot({path:'test-results/budget-spacing-scrolled-desktop.png'});
   expect(box.y).toBeGreaterThanOrEqual(68);expect(box.y+box.height).toBeLessThan(605);
   // Data cells have one border system; computed and editable fields differ by surface.
   const colors=await page.locator('.budget-matrix').evaluate(e=>({
@@ -207,7 +213,7 @@ test('兩層表頭隨內容增高仍固定、原生滾輪與收合月份對齊',
   await page.setViewportSize({width:1366,height:900});await enter(page);
   const grid=page.getByRole('region',{name:'月份與通路預算表'});
   await grid.evaluate(e=>{e.style.scrollBehavior='auto';e.scrollTop=450;e.scrollLeft=210;});
-  await page.evaluate(()=>window.scrollBy(0,document.querySelector('.vertical-scroll')!.getBoundingClientRect().top-240));
+  await page.evaluate(()=>{const grid=document.querySelector('.vertical-scroll')!,header=document.querySelector('.budget-edit-header')!,nav=document.querySelector('.work-navbar')!;window.scrollBy(0,grid.getBoundingClientRect().top-header.getBoundingClientRect().height-nav.getBoundingClientRect().height-16);});
   const header=page.locator('.budget-matrix thead');
   const regionBox=(await grid.boundingBox())!,headBox=(await header.boundingBox())!;
   expect(Math.abs(headBox.y-regionBox.y-1)).toBeLessThan(2);
