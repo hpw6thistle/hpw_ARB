@@ -12,7 +12,7 @@ const empty=():Cell=>({rn:'0',ahr:'0.000',rev:'0.000',mode:'ahr'});
 const fmt=(n:number)=>Number.isFinite(n)?n.toLocaleString('zh-TW',{maximumFractionDigits:3,minimumFractionDigits:3}):'—';
 const percent=(a:number,b:number)=>b?`${(a/b*100).toFixed(2)}%`:'—';
 const calc=(cell:Cell)=>{const rn=Number(cell.rn),ahr=Number(cell.ahr),target=Number(cell.rev);if(!Number.isFinite(rn)||!Number.isFinite(ahr)||!Number.isFinite(target))return {rn:0,ahr:0,rev:0};return {rn,ahr:cell.mode==='rev'?(rn?Math.round(target/rn*1000)/1000:0):ahr,rev:cell.mode==='rev'?target:Math.round(rn*ahr*1000)/1000}};
-export default function VerticalBudget({versionId,revision,status,lines,inventory,onSave,demo=false,onOpenReport,onPendingChange,allowOverride=false}:{allowOverride?:boolean;versionId:number;revision:number;status:string;lines:BudgetLine[];inventory:Capacity[];demo?:boolean;onOpenReport?:()=>void;onPendingChange?:(pending:boolean)=>void;onSave:(items:{month:number;channel:string;rn:number;ahr?:string;target_rev?:string}[])=>Promise<void>}){
+export default function VerticalBudget({versionId,revision,status,lines,inventory,onSave,onOpenReport,onPendingChange,allowOverride=false,readOnly=false}:{readOnly?:boolean;allowOverride?:boolean;versionId:number;revision:number;status:string;lines:BudgetLine[];inventory:Capacity[];onOpenReport?:()=>void;onPendingChange?:(pending:boolean)=>void;onSave:(items:{month:number;channel:string;rn:number;ahr?:string;target_rev?:string}[])=>Promise<void>}){
  const [cells,setCells]=useState<Grid>(()=>initial(lines));const [collapsed,setCollapsed]=useState<number[]>([]);const [dirty,setDirty]=useState<string[]>([]);const [saving,setSaving]=useState(false);const autoTimer=useRef<ReturnType<typeof setTimeout>|null>(null);const lastFailed=useRef(false);const [error,setError]=useState('');const saveLock=useRef(false);
  useEffect(()=>{setCells(initial(lines));setDirty([]);setError('')},[versionId]);
  useEffect(()=>{if(!error)return;const t=window.setTimeout(()=>setError(''),3000);return()=>window.clearTimeout(t)},[error]);
@@ -31,10 +31,10 @@ export default function VerticalBudget({versionId,revision,status,lines,inventor
  function navKeys(e:React.KeyboardEvent<HTMLInputElement>){if(!['Enter','ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)||e.ctrlKey||e.metaKey)return;const inp=e.currentTarget;const list=Array.from(inp.closest('.vertical-scroll')?.querySelectorAll<HTMLInputElement>('input[data-grid-entry]:not(:disabled)')??[]);const idx=list.indexOf(inp);if(idx===-1)return;let next=idx;if(e.key==='Enter'||e.key==='ArrowDown')next=idx+1;else if(e.key==='ArrowUp')next=idx-1;else if(e.key==='ArrowRight')next=idx+1;else if(e.key==='ArrowLeft')next=idx-1;if(next!==idx&&list[next]){e.preventDefault();list[next].focus();list[next].select()}}
  useEffect(()=>{onPendingChange?.(dirty.length>0||saving);},[dirty.length,saving,onPendingChange]);
  useEffect(()=>()=>onPendingChange?.(false),[onPendingChange]);
- const locked=status!=='draft'||saving;
+ const locked=readOnly||status!=='draft'||saving;
  return <div className="vertical-container">
  <section className="annual-summary" aria-label="全年即時預算摘要">
-   <div className="annual-summary-caption"><div><strong>全年預算</strong>{!demo&&<span>即時預覽 · 儲存後以後端為準</span>}</div><small role="status">{saving?'儲存中…':dirty.length?'有未儲存變更':'已與目前版本同步'}</small></div>
+   <div className="annual-summary-caption"><div><strong>全年預算</strong><span>輸入後自動儲存</span></div><small role="status">{saving?'儲存中…':dirty.length?'有未儲存變更':'已與目前版本同步'}</small></div>
    <div className="annual-kpis">
      <div className="annual-kpi annual-kpi-primary"><span>總營收 <small>REV · 含稅</small></span><output aria-label="全年營收">{fmt(annual.rev)}</output></div>
      <div className="annual-kpi"><span>銷售房晚 <small>R/N</small></span><output aria-label="全年房晚">{fmt(annual.rn)}</output></div>

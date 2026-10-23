@@ -6,8 +6,8 @@ export type Hotel = {id:number;code:string;name:string;room_count:number;revisio
 export type Inventory = {month:number;room_count:number;days:number;unavailable:number;available:number;revision:number};
 export type Line = {month:number;channel:string;rn:number;ahr:string;rev:string};
 export type Kind = 'hotel'|'central'|'finance';
-export type Version = {id:number;hotel_id:number;year:number;kind:Kind;status:'draft'|'submitted';revision:number;created_by:string;source_id:number|null;lines:Line[];snapshot?:{source_id:number;source_revision:number;inventory:Inventory[];lines:Line[]}};
-export type State = {priorBudgetsSeeded?:boolean;pnl?:Record<number,PnlLedger>;schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
+export type Version = {last_saved_at?:string|null;id:number;hotel_id:number;year:number;kind:Kind;status:'draft'|'submitted';revision:number;created_by:string;source_id:number|null;lines:Line[];snapshot?:{source_id:number;source_revision:number;inventory:Inventory[];lines:Line[]}};
+export type State = {workspaces?:Record<string,{hotel_id:number;year:number;kind:Kind;version_id:number|null}>;priorBudgetsSeeded?:boolean;pnl?:Record<number,PnlLedger>;schema:1;hotels:Hotel[];inventory:Record<string,Inventory[]>;versions:Version[];nextId:number};
 export class DemoError extends Error {constructor(message:string, public status=422){super(message);}}
 export function need(condition:unknown,message:string,status=422):asserts condition {if(!condition)throw new DemoError(message,status);}
 export function integer(value:unknown, min=0, max=10_000_000):number {

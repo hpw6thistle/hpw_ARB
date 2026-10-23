@@ -13,7 +13,7 @@ function restore():State {
   return seed();
 }
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
-const metadata=(v:Version)=>({id:v.id,kind:v.kind,status:v.status,revision:v.revision,created_by:v.created_by,source_id:v.source_id});
+const metadata=(v:Version)=>({id:v.id,kind:v.kind,status:v.status,revision:v.revision,created_by:v.created_by,source_id:v.source_id,last_saved_at:v.last_saved_at??null});
 const year=(v:unknown)=>integer(Number(v),2020,2100);
 
 export function createDemoTransport(){
@@ -31,7 +31,16 @@ export function createDemoTransport(){
     try{
       const body=typeof options?.body==='string'?JSON.parse(options.body):{};
       let result:unknown,status=200,match:RegExpMatchArray|null;
-      if(method==='GET'&&path==='/api/auth/config')result={mode:'legacy',provider:'anonymous-demo'};
+      const actor=new Headers(options?.headers).get('X-Employee-ID')??'DEMO_VISITOR';
+      if(path==='/api/me/workspace'&&method==='GET'){
+        const saved=current.workspaces?.[actor];let scope=saved?clone(saved):null;let reason=null;
+        if(scope?.version_id&&!current.versions.some(v=>v.id===scope!.version_id)) {scope.version_id=null;reason='unavailable';}
+        result={workspace:scope,reason};
+      }else if(path==='/api/me/workspace'&&method==='PUT'){
+        hotel(integer(body.hotel_id,1,12));year(body.year);need(['hotel','central','finance'].includes(body.kind),'來源不合法');
+        if(body.version_id!==null){const v=version(integer(body.version_id,1));need(v.hotel_id===body.hotel_id&&v.year===body.year&&v.kind===body.kind,'版本不符合工作範圍');}
+        current.workspaces??={};current.workspaces[actor]={hotel_id:body.hotel_id,year:body.year,kind:body.kind,version_id:body.version_id};result={workspace:current.workspaces[actor]};
+      }else if(method==='GET'&&path==='/api/auth/config')result={mode:'legacy',provider:'anonymous-demo'};
       else if(method==='GET'&&path==='/api/catalog')result={hotels:current.hotels,segments};
       else if(method==='GET'&&path==='/api/templates/budget-input.xlsx'){
         return new Response(template() as BodyInit,{headers:{'Content-Type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}});
@@ -63,7 +72,7 @@ export function createDemoTransport(){
       }else if(method==='POST'&&path==='/api/finance/from-source'){
         const source=version(integer(body.source_version_id,1));
         need(source.status==='submitted'&&source.kind!=='finance','僅能從已提交的各館／聯訂來源帶入',409);
-        const v:Version={...clone(source),id:current.nextId++,kind:'finance',status:'draft',revision:0,created_by:'DEMO_VISITOR',source_id:source.id,
+        const v:Version={...clone(source),id:current.nextId++,last_saved_at:new Date().toISOString(),kind:'finance',status:'draft',revision:0,created_by:'DEMO_VISITOR',source_id:source.id,
           snapshot:{source_id:source.id,source_revision:source.revision,inventory:clone(versionInventory(current,source)),lines:clone(source.lines)}};
         current.versions.push(v);current.pnl??={};current.pnl[v.id]=syntheticLedger(v.snapshot!.lines);result=metadata(v);status=201;
       }else if((match=path.match(/^\/api\/finance\/(\d+)\/pnl$/))){
@@ -73,7 +82,7 @@ export function createDemoTransport(){
         else if(method==='PUT'){
           writable(v,body);need(Array.isArray(body.items)&&body.items.length<=2460,'損益項目過多');
           let updated;try{updated=patchLedger(ledger,body.tax_mode as TaxMode,body.items);}catch(e){throw new DemoError(e instanceof Error?e.message:'損益輸入不合法');}
-          current.pnl??={};current.pnl[v.id]=updated;v.revision++;result={revision:v.revision,ledger:updated};
+          current.pnl??={};current.pnl[v.id]=updated;v.revision++;v.last_saved_at=new Date().toISOString();result={revision:v.revision,last_saved_at:v.last_saved_at,ledger:updated};
         }else throw new DemoError('此操作不存在',404);
       }else if(method==='GET'&&path==='/api/finance/compare'){
         const h=hotel(Number(url.searchParams.get('hotel_id'))),y=year(url.searchParams.get('year'));
@@ -88,7 +97,7 @@ export function createDemoTransport(){
           const calculated=items.map(calculate);const keys=calculated.map(l=>`${l.month}/${l.channel}`);
           need(new Set(keys).size===keys.length,'同月份與通路不可重複');
           const projected=[...v.lines.filter(l=>!keys.includes(`${l.month}/${l.channel}`)),...calculated];
-          checkCapacity(current,v,projected);v.lines=projected;v.revision++;result={revision:v.revision,lines:calculated};
+          checkCapacity(current,v,projected);v.lines=projected;v.revision++;v.last_saved_at=new Date().toISOString();result={revision:v.revision,last_saved_at:v.last_saved_at,lines:calculated};
         }else if(method==='POST'&&action==='submit'){
           writable(v,{expected_revision:Number(url.searchParams.get('expected_revision'))});checkCapacity(current,v);v.status='submitted';v.revision++;result=metadata(v);
         }else if(method==='DELETE'&&!action){

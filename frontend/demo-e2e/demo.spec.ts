@@ -131,10 +131,15 @@ test('分頁隔離、重設與窄螢幕橫向表格',async({page,browser})=>{
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+2)).toBe(true);
 });
 
-test('首屏可編列、點擊說明、摘要即時更新且捲動後可見',async({page})=>{
+test('首屏接續提示、編列可達、點擊說明與摘要即時更新',async({page})=>{
   await page.setViewportSize({width:1366,height:633});await enter(page);
   const rn=page.getByLabel('1月 Retail:官網 rn',{exact:true});
   await expect(rn).toBeEnabled();
+  const context=page.getByRole('region',{name:'接續編列資訊',exact:true});
+  expect((await context.boundingBox())!.y+(await context.boundingBox())!.height).toBeLessThan(605);
+  // The approved continuation context precedes the form; compact displays may scroll.
+  expect((await rn.boundingBox())!.y+(await rn.boundingBox())!.height).toBeLessThan(833);
+  await rn.scrollIntoViewIfNeeded();
   expect((await rn.boundingBox())!.y+(await rn.boundingBox())!.height).toBeLessThan(605);
   await expect(page.getByLabel('房間數',{exact:true})).toBeHidden();
   await page.getByRole('button',{name:'填寫說明',exact:true}).click();
